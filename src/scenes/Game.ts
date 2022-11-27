@@ -62,9 +62,7 @@ export default class FlappyBirdGame extends Phaser.Scene {
   }
 
   private detectOutOfBonds() {
-    if (this.bird.y >= HEIGHT - this.bird.height / 2) {
-      this.bird.restart();
-    } else if (this.bird.y - this.bird.height / 2 <= 0) {
+    if (this.bird.isOutOfBoundY()) {
       this.bird.restart();
     }
   }

@@ -1,4 +1,4 @@
-import { GRAVITY, SCROLL_SPEED, VELOCITY } from "../config";
+import { GRAVITY, HEIGHT, VELOCITY } from "../config";
 
 export class FlappyBird extends Phaser.Physics.Arcade.Sprite {
   originalPosition = {
@@ -19,14 +19,9 @@ export class FlappyBird extends Phaser.Physics.Arcade.Sprite {
     this.fly();
   }
 
-  update() {
-    console.log("update from bird");
-  }
-
   private fly() {
     this.setVelocityY(0);
     this.setGravityY(GRAVITY.y);
-    this.setVelocityX(SCROLL_SPEED);
   }
 
   public restart() {
@@ -38,7 +33,7 @@ export class FlappyBird extends Phaser.Physics.Arcade.Sprite {
     this.body.velocity.y = -VELOCITY;
   }
 
-  isOutOfBoundX() {
-    return this.y >= this.scene.scale.height - this.height / 2;
+  isOutOfBoundY() {
+    return this.y >= HEIGHT - this.height / 2 || this.y - this.height / 2 <= 0;
   }
 }
