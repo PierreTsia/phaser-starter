@@ -1,13 +1,20 @@
-import Phaser from 'phaser';
+import Phaser from "phaser";
+export const WIDTH = 800;
+export const HEIGHT = 600;
+export const GRAVITY = { y: 400 };
+export const VELOCITY = 250;
+export const SCROLL_SPEED = 150;
 
 export default {
   type: Phaser.AUTO,
-  parent: 'game',
-  backgroundColor: '#33A5E7',
-  scale: {
-    width: 800,
-    height: 600,
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH
-  }
+  width: WIDTH,
+  height: HEIGHT,
+  parent: "game",
+  backgroundColor: "#000000",
+  physics: {
+    default: "arcade",
+    arcade: {
+      debug: true,
+    },
+  },
 };
