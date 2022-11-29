@@ -1,4 +1,8 @@
-import { GRAVITY, HEIGHT, VELOCITY } from "../config";
+import { GRAVITY, HEIGHT, VELOCITY, WIDTH } from "../config";
+const birdInitialPosition = {
+  x: WIDTH * 0.1,
+  y: HEIGHT / 2,
+};
 
 export class FlappyBird extends Phaser.Physics.Arcade.Sprite {
   originalPosition = {
@@ -6,7 +10,11 @@ export class FlappyBird extends Phaser.Physics.Arcade.Sprite {
     y: this.y,
   };
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(
+    scene: Phaser.Scene,
+    x = birdInitialPosition.x,
+    y = birdInitialPosition.y
+  ) {
     super(scene, x, y, "bird");
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -15,18 +23,12 @@ export class FlappyBird extends Phaser.Physics.Arcade.Sprite {
 
     this.setOrigin(0.5, 0.5);
     this.setPosition(x, y);
-
     this.fly();
   }
 
   private fly() {
     this.setVelocityY(0);
     this.setGravityY(GRAVITY.y);
-  }
-
-  public restart() {
-    this.setPosition(this.originalPosition.x, this.originalPosition.y);
-    this.fly();
   }
 
   private flap() {

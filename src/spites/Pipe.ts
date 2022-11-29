@@ -10,6 +10,7 @@ export class Pipe extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, "pipe");
     scene.add.existing(this);
     scene.physics.add.existing(this);
+    this.setImmovable(true);
     this.setPosition(x, y);
     this.setOrigin(...origin);
     this.setVelocityX(-SCROLL_SPEED);

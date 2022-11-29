@@ -1,15 +1,11 @@
 import Phaser from "phaser";
-import { HEIGHT, WIDTH } from "../config";
+import { WIDTH } from "../config";
 import { FlappyBird } from "../spites/FlappyBird";
 import { Pipe } from "../spites/Pipe";
 
 export default class FlappyBirdGame extends Phaser.Scene {
   bird!: FlappyBird;
   pipesSet!: PipesSet;
-  birdInitialPosition = {
-    x: WIDTH * 0.1,
-    y: HEIGHT / 2,
-  };
 
   constructor() {
     super("GameScene");
@@ -23,12 +19,9 @@ export default class FlappyBirdGame extends Phaser.Scene {
 
   create() {
     this.physics.add.image(0, 0, "sky").setOrigin(0, 0);
-    this.bird = new FlappyBird(
-      this,
-      this.birdInitialPosition.x,
-      this.birdInitialPosition.y
-    );
+    this.bird = new FlappyBird(this);
     this.pipesSet = new PipesSet(this);
+    this.addColliders();
   }
 
   // 60 fps
@@ -39,8 +32,26 @@ export default class FlappyBirdGame extends Phaser.Scene {
 
   private detectOutOfBonds() {
     if (this.bird.isOutOfBoundY()) {
-      this.bird.restart();
+      this.gameOver();
     }
+  }
+
+  private addColliders() {
+    this.physics.add.collider(
+      this.bird,
+      this.pipesSet.pipes,
+      this.gameOver,
+      undefined,
+      this
+    );
+  }
+
+  private gameOver() {
+    this.physics.pause();
+    this.bird.setTint(0xff0000);
+    setTimeout(() => {
+      this.scene.restart();
+    }, 1000);
   }
 }
 
