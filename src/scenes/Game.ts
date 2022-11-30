@@ -6,6 +6,8 @@ import { Pipe } from "../spites/Pipe";
 export default class FlappyBirdGame extends Phaser.Scene {
   bird!: FlappyBird;
   pipesSet!: PipesSet;
+  score: number = 0;
+  scoreText!: Phaser.GameObjects.Text;
 
   constructor() {
     super("GameScene");
@@ -22,12 +24,23 @@ export default class FlappyBirdGame extends Phaser.Scene {
     this.bird = new FlappyBird(this);
     this.pipesSet = new PipesSet(this);
     this.addColliders();
+    this.addScore();
   }
 
   // 60 fps
   update(time: number, delta: number) {
     this.detectOutOfBonds();
-    this.pipesSet.recyclePipes();
+    if (this.pipesSet.onePipePairHasGoneLeft()) {
+      this.pipesSet.recyclePipes();
+      this.increaseScore();
+    }
+  }
+
+  addScore() {
+    this.scoreText = this.add.text(16, 16, `Score: ${this.score}`, {
+      fontSize: "32px",
+      color: "#fff",
+    });
   }
 
   private detectOutOfBonds() {
@@ -46,12 +59,21 @@ export default class FlappyBirdGame extends Phaser.Scene {
     );
   }
 
+  private increaseScore() {
+    this.score++;
+    this.scoreText.setText(`Score: ${this.score}`);
+  }
+
   private gameOver() {
     this.physics.pause();
     this.bird.setTint(0xff0000);
-    setTimeout(() => {
-      this.scene.restart();
-    }, 1000);
+    this.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        this.scene.restart();
+      },
+      loop: false,
+    });
   }
 }
 
@@ -67,10 +89,12 @@ class PipesSet {
   }
 
   recyclePipes() {
-    if (this.outOfBoundsPipesCount() >= 2) {
-      const [uPipe, lPipe] = this.pipes.splice(0, 2);
-      this.placePipes(uPipe, lPipe);
-    }
+    const [uPipe, lPipe] = this.pipes.splice(0, 2);
+    this.placePipes(uPipe, lPipe);
+  }
+
+  onePipePairHasGoneLeft() {
+    return this.outOfBoundsPipesCount() >= 2;
   }
 
   private placePipes(uPipe: Pipe, lPipe: Pipe) {

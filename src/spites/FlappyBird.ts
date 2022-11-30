@@ -23,6 +23,7 @@ export class FlappyBird extends Phaser.Physics.Arcade.Sprite {
 
     this.setOrigin(0.5, 0.5);
     this.setPosition(x, y);
+    this.setCollideWorldBounds(true);
     this.fly();
   }
 
@@ -36,6 +37,6 @@ export class FlappyBird extends Phaser.Physics.Arcade.Sprite {
   }
 
   isOutOfBoundY() {
-    return this.y >= HEIGHT - this.height / 2 || this.y - this.height / 2 <= 0;
+    return this.getBounds().bottom >= HEIGHT || this.getBounds().top <= 0;
   }
 }
