@@ -8,6 +8,8 @@ export default class FlappyBirdGame extends Phaser.Scene {
   pipesSet!: PipesSet;
   score: number = 0;
   scoreText!: Phaser.GameObjects.Text;
+  bestScore: number = 0;
+  bestScoreText!: Phaser.GameObjects.Text;
 
   constructor() {
     super("GameScene");
@@ -24,7 +26,7 @@ export default class FlappyBirdGame extends Phaser.Scene {
     this.bird = new FlappyBird(this);
     this.pipesSet = new PipesSet(this);
     this.addColliders();
-    this.addScore();
+    this.createScores();
   }
 
   // 60 fps
@@ -32,15 +34,41 @@ export default class FlappyBirdGame extends Phaser.Scene {
     this.detectOutOfBonds();
     if (this.pipesSet.onePipePairHasGoneLeft()) {
       this.pipesSet.recyclePipes();
-      this.increaseScore();
+      this.increaseScores();
     }
   }
 
-  addScore() {
+  createScores() {
     this.scoreText = this.add.text(16, 16, `Score: ${this.score}`, {
       fontSize: "32px",
       color: "#fff",
     });
+
+    this.initBestScore();
+  }
+
+  private initBestScore() {
+    const bestScore = localStorage.getItem("bestScore");
+    if (bestScore) {
+      this.bestScore = parseInt(bestScore);
+    }
+    this.bestScoreText = this.add.text(
+      16,
+      46,
+      `Best Score: ${this.bestScore}`,
+      {
+        fontSize: "24px",
+        color: "#fff",
+      }
+    );
+  }
+
+  private updateBestScore() {
+    if (this.score > this.bestScore) {
+      this.bestScore = this.score;
+      this.bestScoreText.setText(`Best Score: ${this.bestScore}`);
+      localStorage.setItem("bestScore", this.bestScore.toString());
+    }
   }
 
   private detectOutOfBonds() {
@@ -59,9 +87,10 @@ export default class FlappyBirdGame extends Phaser.Scene {
     );
   }
 
-  private increaseScore() {
+  private increaseScores() {
     this.score++;
     this.scoreText.setText(`Score: ${this.score}`);
+    this.updateBestScore();
   }
 
   private gameOver() {
@@ -70,6 +99,7 @@ export default class FlappyBirdGame extends Phaser.Scene {
     this.time.addEvent({
       delay: 1000,
       callback: () => {
+        this.score = 0;
         this.scene.restart();
       },
       loop: false,
