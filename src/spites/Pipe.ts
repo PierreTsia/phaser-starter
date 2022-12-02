@@ -8,7 +8,7 @@ export class Pipe extends BaseSprite {
     y: number,
     origin: [number, number] = [0, 0]
   ) {
-    super("pipe", scene, x, y, scene.config);
+    super("pipe", scene, x, y);
     this.setImmovable(true);
     this.setOrigin(...origin);
     this.setVelocityX(-scene.config.scrollSpeed);

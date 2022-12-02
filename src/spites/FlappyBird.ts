@@ -1,25 +1,15 @@
 import BaseScene from "../scenes/BaseScene";
+import BaseSprite from "./BaseSprite";
 
-export class FlappyBird extends Phaser.Physics.Arcade.Sprite {
-  gravity: number;
-  velocity: number;
-  screenWidth: number;
-  screenHeight: number;
-
+export class FlappyBird extends BaseSprite {
   constructor(
     scene: BaseScene,
     x = scene.config.startPosition.x,
     y = scene.config.startPosition.y
   ) {
-    super(scene, x, y, "bird");
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
+    super("bird", scene, x, y);
     scene.input.on("pointerdown", () => this.flap());
     scene.input.keyboard.on("keydown-SPACE", () => this.flap());
-    this.gravity = scene.config.gravity.y;
-    this.velocity = scene.config.flapVelocity;
-    this.screenWidth = scene.config.width;
-    this.screenHeight = scene.config.height;
 
     this.setOrigin(0.5, 0.5);
     this.setPosition(x, y);
@@ -29,16 +19,16 @@ export class FlappyBird extends Phaser.Physics.Arcade.Sprite {
 
   private fly() {
     this.setVelocityY(0);
-    this.setGravityY(this.gravity);
+    this.setGravityY(this.config.gravity.y);
   }
 
   private flap() {
-    this.body.velocity.y = -this.velocity;
+    this.body.velocity.y = -this.config.flapVelocity;
   }
 
   isOutOfBoundY() {
     return (
-      this.getBounds().bottom >= this.screenHeight || this.getBounds().top <= 0
+      this.getBounds().bottom >= this.config.height || this.getBounds().top <= 0
     );
   }
 }
