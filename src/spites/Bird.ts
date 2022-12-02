@@ -1,7 +1,7 @@
 import BaseScene from "../scenes/BaseScene";
 import BaseSprite from "./BaseSprite";
 
-export class FlappyBird extends BaseSprite {
+export class Bird extends BaseSprite {
   constructor(
     scene: BaseScene,
     x = scene.config.startPosition.x,

@@ -1,17 +1,23 @@
 import Phaser from "phaser";
 
-import { FlappyBird } from "../spites/FlappyBird";
+import { Bird } from "../spites/Bird";
 import { Pipe } from "../spites/Pipe";
 import BaseScene from "./BaseScene";
 import { GameConfig } from "../index";
 
 export default class FlappyBirdGame extends BaseScene {
-  bird!: FlappyBird;
+  bird!: Bird;
   pipesSet!: PipesSet;
   score: number = 0;
   scoreText!: Phaser.GameObjects.Text;
   bestScore: number = 0;
   bestScoreText!: Phaser.GameObjects.Text;
+  initialTime: number = 3;
+  timedEvent!: Phaser.Time.TimerEvent;
+  countDownText!: Phaser.GameObjects.Text;
+  isPaused: boolean = false;
+  pauseEvent!: Phaser.Events.EventEmitter;
+  pauseButton!: Phaser.GameObjects.Image;
 
   constructor(config: any) {
     super("GameScene", config);
@@ -19,22 +25,24 @@ export default class FlappyBirdGame extends BaseScene {
 
   create() {
     super.create();
-    this.bird = new FlappyBird(this);
+    this.bird = new Bird(this);
     this.pipesSet = new PipesSet(this);
     this.addColliders();
     this.createScores();
     this.createPauseButton();
+    this.listenToEvents();
   }
 
   private createPauseButton() {
-    const pause = this.add
+    this.pauseButton = this.add
       .image(this.config.width - 50, this.config.height - 50, "pause")
       .setScale(3);
-    pause.setInteractive();
-    pause.on("pointerdown", this.pauseGame, this);
+    this.pauseButton.setInteractive();
+    this.pauseButton.on("pointerdown", this.pauseGame, this);
   }
 
   private pauseGame() {
+    this.isPaused = true;
     this.physics.pause();
     this.scene.pause();
     this.scene.launch("PauseScene");
@@ -43,9 +51,47 @@ export default class FlappyBirdGame extends BaseScene {
   // 60 fps
   update(time: number, delta: number) {
     this.detectOutOfBonds();
+    this.recyclePipes();
+  }
+
+  private recyclePipes() {
     if (this.pipesSet.onePipePairHasGoneLeft()) {
       this.pipesSet.recyclePipes();
       this.increaseScores();
+    }
+  }
+
+  listenToEvents() {
+    if (this.pauseEvent) {
+      return;
+    }
+
+    this.pauseEvent = this.events.on("resume", () => {
+      this.initialTime = 3;
+      this.countDownText = this.add
+        .text(
+          ...this.screenCenter,
+          "Fly in: " + this.initialTime,
+          this.fontOptions
+        )
+        .setOrigin(0.5);
+      this.timedEvent = this.time.addEvent({
+        delay: 1000,
+        callback: this.countDown,
+        callbackScope: this,
+        loop: true,
+      });
+    });
+  }
+
+  countDown() {
+    this.initialTime--;
+    this.countDownText.setText("Fly in: " + this.initialTime);
+    if (this.initialTime <= 0) {
+      this.isPaused = false;
+      this.countDownText.setText("");
+      this.physics.resume();
+      this.timedEvent.remove();
     }
   }
 
@@ -122,6 +168,8 @@ class PipesSet {
   readonly pipesToRender = 4;
   config: GameConfig;
   pipes: Pipe[] = [];
+  pipeVerticalDistanceRange: [number, number] = [80, 250];
+  pipeHorizontalDistanceRange: [number, number] = [200, 460];
   constructor(scene: BaseScene) {
     this.config = scene.config;
     [...Array(this.pipesToRender).keys()].forEach(() => {
@@ -142,13 +190,11 @@ class PipesSet {
 
   private placePipes(uPipe: Pipe, lPipe: Pipe) {
     const lastPipeX = this.pipes[this.pipes.length - 1]?.x || this.config.width;
-    const pipeVerticalDistanceRange: [number, number] = [80, 250];
-    const pipeHorizontalDistanceRange: [number, number] = [200, 460];
     const pipesHorizontalSpace = Phaser.Math.Between(
-      ...pipeHorizontalDistanceRange
+      ...this.pipeHorizontalDistanceRange
     );
     const pipesVerticalSpace = Phaser.Math.Between(
-      ...pipeVerticalDistanceRange
+      ...this.pipeVerticalDistanceRange
     );
     let upperPipeLengthFromTop = Phaser.Math.Between(30, 320);
 

@@ -13,40 +13,54 @@ export default class PauseScene extends BaseScene {
     { scene: "PlayScene", text: "Continue" },
     { scene: "MenuScene", text: "Exit" },
   ];
+
+  buttons: Phaser.GameObjects.Text[] = [];
   constructor(config: GameConfig) {
     super("PauseScene", config);
-    //this.createMenu(this.menu, (m) => this.setupMenuEvents(m));
   }
 
   create() {
-    super.create();
     this.add
-      .text(...this.screenCenter, "Paused", this.fontOptions)
+      .text(this.screenCenter[0], 50, "Paused", this.fontOptions)
       .setOrigin(0.5);
+
+    this.createMenu();
   }
 
-  setupMenuEvents(menuItem: MenuItem) {
-    const textGO = menuItem.textGO!;
-    textGO.setInteractive();
-
-    textGO.on("pointerover", () => {
-      textGO.setStyle({ fill: "#ff0" });
+  setupMenuEvents() {
+    this.buttons.forEach((button) => {
+      button.setInteractive();
+      button.on("pointerover", () => {
+        button.setStyle({ fill: "#ff0" });
+      });
+      button.on("pointerout", () => {
+        button.setStyle({ fill: "#fff" });
+      });
+      button.on("pointerdown", () => {
+        console.log("clicked");
+        if (button.text === "Continue") {
+          this.scene.stop();
+          this.scene.resume("GameScene");
+        } else {
+          console.log("exit");
+        }
+      });
     });
+  }
+  createMenu() {
+    let lastMenuPositionY = 0;
+    this.buttons = [];
+    const [x, y] = this.screenCenter;
+    for (let i = 0; i < this.menu.length; i++) {
+      const menuPosition: [number, number] = [x, y + lastMenuPositionY];
+      this.buttons.push(
+        this.add
+          .text(...menuPosition, this.menu[i].text, this.fontOptions)
+          .setOrigin(0.5, 1)
+      );
+      lastMenuPositionY += this.lineHeight;
+    }
 
-    textGO.on("pointerout", () => {
-      textGO.setStyle({ fill: "#fff" });
-    });
-
-    textGO.on("pointerup", () => {
-      if (menuItem.scene && menuItem.text === "Continue") {
-        // Shutting down the Pause Scene and resuming the Play Scene
-        this.scene.stop();
-        this.scene.resume(menuItem.scene);
-      } else {
-        // Shutting PlayScene, PauseScene and running Menu
-        this.scene.stop("PlayScene");
-        this.scene.start(menuItem.scene);
-      }
-    });
+    this.setupMenuEvents();
   }
 }

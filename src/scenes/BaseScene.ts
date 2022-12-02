@@ -28,11 +28,11 @@ export default class BaseScene extends Phaser.Scene {
       const [x, y] = this.screenCenter;
 
       const menuPosition: [number, number] = [x, y + lastMenuPositionY];
-      menuItem["textGO"] = this.add
+      this.add
         .text(...menuPosition, menuItem.text, this.fontOptions)
         .setOrigin(0.5, 1);
       lastMenuPositionY += this.lineHeight;
-      setupMenuEvents(menuItem);
+      //setupMenuEvents(menuItem);
     });
   }
 }
