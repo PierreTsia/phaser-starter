@@ -3,6 +3,7 @@ import Phaser from "phaser";
 import FlappyBirdGame from "./scenes/Game";
 import PreloadAssets from "./scenes/PreloadAssets";
 import PauseScene from "./scenes/PauseScene";
+import MenuScene from "./scenes/MenuScene";
 
 const WIDTH = 800;
 const HEIGHT = 600;
@@ -22,7 +23,7 @@ const SHARED_CONFIG = {
 
 const createScene = (Scene: SceneType) => new Scene(SHARED_CONFIG);
 const initScenes = () => Scenes.map(createScene);
-const Scenes = [PreloadAssets, FlappyBirdGame, PauseScene] as const;
+const Scenes = [PreloadAssets, MenuScene, FlappyBirdGame, PauseScene] as const;
 
 const config = {
   type: Phaser.AUTO,

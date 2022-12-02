@@ -25,12 +25,23 @@ export default class FlappyBirdGame extends BaseScene {
 
   create() {
     super.create();
-    this.bird = new Bird(this);
+    this.createBird();
     this.pipesSet = new PipesSet(this);
     this.addColliders();
     this.createScores();
     this.createPauseButton();
     this.listenToEvents();
+  }
+
+  private createBird() {
+    this.bird = new Bird(this);
+    this.anims.create({
+      key: "fly",
+      frames: this.anims.generateFrameNumbers("bird", { start: 9, end: 15 }),
+      frameRate: 8,
+      repeat: -1,
+    });
+    this.bird.play("fly");
   }
 
   private createPauseButton() {

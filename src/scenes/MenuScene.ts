@@ -1,27 +1,27 @@
 import BaseScene from "./BaseScene";
 import { GameConfig } from "../index";
 export interface MenuItem {
-  scene: string;
+  scene: string | null;
   text: string;
-  textGO?: Phaser.GameObjects.Text;
 }
-export interface SetupMenuEvents {
-  (item: MenuItem): void;
-}
-export default class PauseScene extends BaseScene {
+
+export default class MenuScene extends BaseScene {
   menu: MenuItem[] = [
-    { scene: "PlayScene", text: "Continue" },
-    { scene: "MenuScene", text: "Exit" },
+    { scene: "PlayScene", text: "Play" },
+    { scene: "ScoreScene", text: "Score" },
+    { scene: null, text: "Exit" },
   ];
 
   buttons: Phaser.GameObjects.Text[] = [];
   constructor(config: GameConfig) {
-    super("PauseScene", config);
+    super("MenuScene", config);
   }
 
   create() {
+    super.create();
+
     this.add
-      .text(this.screenCenter[0], 50, "Paused", this.fontOptions)
+      .text(this.screenCenter[0], 50, "Flappy Bird 🐥", this.fontOptions)
       .setOrigin(0.5);
 
     this.createMenu();
@@ -37,12 +37,10 @@ export default class PauseScene extends BaseScene {
         button.setStyle({ fill: "#fff" });
       });
       button.on("pointerdown", () => {
-        console.log("clicked");
-        if (button.text === "Continue") {
+        if (button.text === "Play") {
           this.scene.stop();
-          this.scene.resume("GameScene");
+          this.scene.start("GameScene");
         } else {
-          this.scene.stop("GameScene");
           this.scene.start("MenuScene");
         }
       });

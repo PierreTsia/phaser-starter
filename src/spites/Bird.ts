@@ -13,6 +13,10 @@ export class Bird extends BaseSprite {
 
     this.setOrigin(0.5, 0.5);
     this.setPosition(x, y);
+    this.setFlipX(true);
+    this.setScale(3);
+    this.setBodySize(this.width, this.height - 8);
+
     this.setCollideWorldBounds(true);
     this.fly();
   }
