@@ -1,18 +1,16 @@
-import { SCROLL_SPEED } from "../config";
+import BaseScene from "../scenes/BaseScene";
+import BaseSprite from "./BaseSprite";
 
-export class Pipe extends Phaser.Physics.Arcade.Sprite {
+export class Pipe extends BaseSprite {
   constructor(
-    scene: Phaser.Scene,
+    scene: BaseScene,
     x: number,
     y: number,
     origin: [number, number] = [0, 0]
   ) {
-    super(scene, x, y, "pipe");
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
+    super("pipe", scene, x, y, scene.config);
     this.setImmovable(true);
-    this.setPosition(x, y);
     this.setOrigin(...origin);
-    this.setVelocityX(-SCROLL_SPEED);
+    this.setVelocityX(-scene.config.scrollSpeed);
   }
 }

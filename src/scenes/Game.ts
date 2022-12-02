@@ -1,9 +1,11 @@
 import Phaser from "phaser";
-import { WIDTH } from "../config";
+
 import { FlappyBird } from "../spites/FlappyBird";
 import { Pipe } from "../spites/Pipe";
+import BaseScene from "./BaseScene";
+import { GameConfig } from "../index";
 
-export default class FlappyBirdGame extends Phaser.Scene {
+export default class FlappyBirdGame extends BaseScene {
   bird!: FlappyBird;
   pipesSet!: PipesSet;
   score: number = 0;
@@ -11,22 +13,31 @@ export default class FlappyBirdGame extends Phaser.Scene {
   bestScore: number = 0;
   bestScoreText!: Phaser.GameObjects.Text;
 
-  constructor() {
-    super("GameScene");
-  }
-
-  preload() {
-    this.load.image("sky", "assets/sky.png");
-    this.load.image("bird", "assets/bird.png");
-    this.load.image("pipe", "assets/pipe.png");
+  constructor(config: any) {
+    super("GameScene", config);
   }
 
   create() {
-    this.physics.add.image(0, 0, "sky").setOrigin(0, 0);
+    super.create();
     this.bird = new FlappyBird(this);
     this.pipesSet = new PipesSet(this);
     this.addColliders();
     this.createScores();
+    this.createPauseButton();
+  }
+
+  private createPauseButton() {
+    const pause = this.add
+      .image(this.config.width - 50, this.config.height - 50, "pause")
+      .setScale(3);
+    pause.setInteractive();
+    pause.on("pointerdown", this.pauseGame, this);
+  }
+
+  private pauseGame() {
+    this.physics.pause();
+    this.scene.pause();
+    this.scene.launch("PauseScene");
   }
 
   // 60 fps
@@ -109,8 +120,10 @@ export default class FlappyBirdGame extends Phaser.Scene {
 
 class PipesSet {
   readonly pipesToRender = 4;
+  config: GameConfig;
   pipes: Pipe[] = [];
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: BaseScene) {
+    this.config = scene.config;
     [...Array(this.pipesToRender).keys()].forEach(() => {
       const upperPipe = new Pipe(scene, 0, 0, [0, 1]);
       const lowerPipe = new Pipe(scene, 0, 0);
@@ -128,7 +141,7 @@ class PipesSet {
   }
 
   private placePipes(uPipe: Pipe, lPipe: Pipe) {
-    const lastPipeX = this.pipes[this.pipes.length - 1]?.x || WIDTH;
+    const lastPipeX = this.pipes[this.pipes.length - 1]?.x || this.config.width;
     const pipeVerticalDistanceRange: [number, number] = [80, 250];
     const pipeHorizontalDistanceRange: [number, number] = [200, 460];
     const pipesHorizontalSpace = Phaser.Math.Between(
