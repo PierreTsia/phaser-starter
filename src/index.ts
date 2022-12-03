@@ -3,7 +3,7 @@ import Phaser from "phaser";
 import GameScene from "./scenes/GameScene";
 import PreloadAssets from "./scenes/PreloadAssets";
 
-const WIDTH = 800;
+const WIDTH = 1280;
 const HEIGHT = 600;
 
 type SceneType = typeof Scenes[number];
@@ -12,7 +12,6 @@ export type GameConfig = typeof SHARED_CONFIG;
 const SHARED_CONFIG = {
   width: WIDTH,
   height: HEIGHT,
-  backgroundColor: "#33A5E7",
 };
 
 const createScene = (Scene: SceneType) => new Scene(SHARED_CONFIG);
