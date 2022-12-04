@@ -30,6 +30,7 @@ export default class Player extends BaseSprite {
   };
   constructor(scene: BaseScene, x: number, y: number) {
     super("player", scene, x, y);
+    this.setOrigin(0.5, 1);
     this.setGravity(0, 800);
     this.setCollideWorldBounds(true);
     this.speed = scene.config.playerSpeed;
