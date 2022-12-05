@@ -14,6 +14,8 @@ type LayerMap = Record<LayerName, Phaser.Tilemaps.TilemapLayer>;
 export default class GameScene extends BaseScene {
   player!: IPlayer;
   layers!: LayerMap;
+  graphics!: Phaser.GameObjects.Graphics;
+  line: Phaser.Geom.Line = new Phaser.Geom.Line();
 
   constructor(config: GameConfig) {
     super("GameScene", config);
@@ -39,8 +41,8 @@ export default class GameScene extends BaseScene {
 
       const EnemyClass = EnemyFactory(enemyName);
       const enemy = new EnemyClass(this, spawn.x!, spawn.y!);
-      enemy.turn("left");
       enemy.addCollider(this.layers.colliders).addCollider(this.player);
+      enemy.walk(enemy.currentDirection);
     });
   }
 
