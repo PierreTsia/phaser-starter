@@ -67,8 +67,8 @@
                  "rotation":0,
                  "visible":true,
                  "width":0,
-                 "x":65.3859116953151,
-                 "y":328.951803168183
+                 "x":25.9410178631614,
+                 "y":325.581395348837
                 }, 
                 {
                  "class":"",
@@ -189,9 +189,80 @@
          "width":100,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":5,
+         "name":"enemy_spawns",
+         "objects":[
+                {
+                 "class":"",
+                 "height":0,
+                 "id":3,
+                 "name":"",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"enemy",
+                         "type":"string",
+                         "value":"bird"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":517.694641051567,
+                 "y":200.202224469161
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":4,
+                 "name":"",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"enemy",
+                         "type":"string",
+                         "value":"snake"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":979.440512301988,
+                 "y":330.299966295922
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":5,
+                 "name":"",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"enemy",
+                         "type":"string",
+                         "value":"bird"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":1293.56252106505,
+                 "y":202.224469160768
+                }],
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"enemy",
+                 "type":"string",
+                 "value":"bird"
+                }],
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":5,
- "nextobjectid":3,
+ "nextlayerid":6,
+ "nextobjectid":6,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.2",

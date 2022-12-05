@@ -2,12 +2,12 @@ import BaseScene from "./BaseScene";
 import { GameConfig } from "../index";
 import Player, { IPlayer } from "../sprites/Player";
 import { WithCollision } from "../mixins/Collidable";
+import { EnemyFactory, EnemyName } from "../sprites/types";
 
 const LAYERS = ["colliders", "environment", "platforms"] as const;
 const ZONES = ["startZone", "endZone"] as const;
 type ZoneName = typeof ZONES[number];
 type LayerName = typeof LAYERS[number];
-const PlayerWithCollision = WithCollision(Player);
 
 type LayerMap = Record<LayerName, Phaser.Tilemaps.TilemapLayer>;
 
@@ -27,9 +27,25 @@ export default class GameScene extends BaseScene {
     this.initEndOfLevel(end);
     this.initCameras();
     this.physics.world.setBounds(...this.bounds);
+    this.populateWithEnemies(map);
+  }
+
+  private populateWithEnemies(map: Phaser.Tilemaps.Tilemap) {
+    const spawns = this.createSpawningZones(map);
+    spawns.forEach((spawn) => {
+      const enemyName: EnemyName = spawn.properties?.find(
+        (p: { name: string }) => p.name === "enemy"
+      )?.value;
+
+      const EnemyClass = EnemyFactory(enemyName);
+      const enemy = new EnemyClass(this, spawn.x!, spawn.y!);
+      enemy.turn("left");
+      enemy.addCollider(this.layers.colliders).addCollider(this.player);
+    });
   }
 
   private initPlayer(start: Phaser.Types.Tilemaps.TiledObject) {
+    const PlayerWithCollision = WithCollision(Player);
     this.player = new PlayerWithCollision(this, start.x!, start.y!);
     this.player.addCollider(this.layers.colliders);
   }
@@ -40,6 +56,9 @@ export default class GameScene extends BaseScene {
       start: this.findObjectLayer("startZone", playerZones)!,
       end: this.findObjectLayer("endZone", playerZones)!,
     };
+  }
+  private createSpawningZones(map: Phaser.Tilemaps.Tilemap) {
+    return map.getObjectLayer("enemy_spawns").objects;
   }
 
   private findObjectLayer(

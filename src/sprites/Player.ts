@@ -1,8 +1,7 @@
-import BaseSprite, { AnimConfig } from "./BaseSprite";
+import BaseSprite, { AnimConfig, Direction } from "./BaseSprite";
 import BaseScene from "../scenes/BaseScene";
 import { Collidable } from "../mixins/Collidable";
 
-type Direction = "left" | "right";
 export type IPlayer = Player & Collidable;
 
 export default class Player extends BaseSprite {
@@ -30,9 +29,8 @@ export default class Player extends BaseSprite {
   };
   constructor(scene: BaseScene, x: number, y: number) {
     super("player", scene, x, y);
-    this.setOrigin(0.5, 1);
-    this.setGravity(0, 800);
-    this.setCollideWorldBounds(true);
+    this.setBodySize(this.width - 10, 35);
+    this.setOffset(8, 5);
     this.speed = scene.config.playerSpeed;
     this.jumpRange = this.speed * 1.8;
     this.cursors = scene.input.keyboard.createCursorKeys();
@@ -40,6 +38,7 @@ export default class Player extends BaseSprite {
   }
 
   update(time: number, delta: number) {
+    super.update(time, delta);
     const { left, right, space } = this.cursors;
     const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space);
 
@@ -69,27 +68,8 @@ export default class Player extends BaseSprite {
     this.setVelocityY(-this.jumpRange);
   }
 
-  isOnTheGround() {
-    return this.body.blocked.down;
-  }
-
-  turn(direction: Direction = "right") {
-    this.flipX = direction === "left";
-  }
-
-  stand() {
-    this.setVelocityX(0);
-    this.play("idle", true);
-  }
-
-  move(direction: Direction) {
-    const velocity = direction === "left" ? -this.speed : this.speed;
-    this.setVelocityX(velocity);
-  }
-
   run(direction: Direction) {
-    this.turn(direction);
+    super.run(direction);
     this.play("run", true);
-    this.move(direction);
   }
 }
