@@ -68,7 +68,7 @@ export default class Enemy extends BaseSprite {
       this.y
     );
     this.scene.time.addEvent({
-      delay: 1000,
+      delay: 500,
       callback: () => {
         this.canMove = true;
         this.isTurningAround = false;
@@ -78,7 +78,10 @@ export default class Enemy extends BaseSprite {
 
   update(time: number, delta: number) {
     super.update(time, delta);
+    console.log("update", this.hasReachedXEdge());
     if (!this.isTurningAround) {
+      console.log("isWalking", this.hasReachedXEdge());
+      console.log("hasHits", this.hasHits);
       if (!this.hasHits || this.hasReachedXEdge()) {
         this.canMove = false;
       }
