@@ -8,9 +8,10 @@ export type IEnemy = Enemy & Collidable;
 export default class Enemy extends BaseSprite {
   speed: number = 100;
   meleeRange: number = 1;
-  canMove: boolean = true;
   currentDirection: Direction = "left";
-  isTurningAround: boolean = false;
+  currentPatrolDistance: number = 0;
+  maxPatrolDistance: number = 100;
+  lastTurnTime: number = 0;
 
   constructor(
     name: string,
@@ -25,11 +26,11 @@ export default class Enemy extends BaseSprite {
     this.setImmovable(true);
 
     super.animate(name, anims);
-    scene.events.on(
+    /*scene.events.on(
       Phaser.Scenes.Events.UPDATE,
       () => this.detectPlayerProximity(scene.player),
       this
-    );
+    );*/
   }
 
   detectPlayerProximity(player: IPlayer) {
@@ -60,42 +61,35 @@ export default class Enemy extends BaseSprite {
 
   turnAround(direction: Direction) {
     this.currentDirection = direction === "right" ? "left" : "right";
-    console.log("turn around");
     this.turn(this.currentDirection);
     const directionMultiplier = this.currentDirection === "right" ? 1 : -1;
     this.setPosition(
       this.x + (directionMultiplier * this.body.width) / 2,
       this.y
     );
-    this.scene.time.addEvent({
-      delay: 500,
-      callback: () => {
-        this.canMove = true;
-        this.isTurningAround = false;
-      },
-    });
+    this.refreshRayCast(this.x, this.y);
+    this.walk(this.currentDirection);
   }
 
   update(time: number, delta: number) {
     super.update(time, delta);
-    console.log("update", this.hasReachedXEdge());
-    if (!this.isTurningAround) {
-      console.log("isWalking", this.hasReachedXEdge());
-      console.log("hasHits", this.hasHits);
-      if (!this.hasHits || this.hasReachedXEdge()) {
-        this.canMove = false;
-      }
+    this.patrol(time);
+  }
 
-      if (this.canMove) {
-        this.walk(this.currentDirection);
-      } else {
-        this.isTurningAround = true;
-        this.stand();
-        this.scene.time.addEvent({
-          delay: 1000,
-          callback: () => this.turnAround(this.currentDirection),
-        });
-      }
+  private patrol(time: number) {
+    const isTurning = time - this.lastTurnTime < 100;
+    if (
+      isTurning ||
+      !this.body ||
+      !(this.body as Phaser.Physics.Arcade.Body).onFloor()
+    ) {
+      return;
+    }
+    if (!this.isOnPlatform || this.hasReachedXEdge()) {
+      this.turnAround(this.currentDirection);
+      this.lastTurnTime = time;
+    } else {
+      this.walk(this.currentDirection);
     }
   }
 }

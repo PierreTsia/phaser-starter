@@ -11,7 +11,7 @@ export default class BaseScene extends Phaser.Scene {
     this.screenCenter = [config.width / 2, config.height / 2];
   }
   get bounds(): Coords {
-    const { width, height, mapOffset } = this.config;
-    return [0, 0, width + mapOffset, height];
+    const { width, height, mapOffsetX, mapOffsetY } = this.config;
+    return [0, 0, width + mapOffsetX, height + mapOffsetY];
   }
 }

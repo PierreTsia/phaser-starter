@@ -1,15 +1,11 @@
 import BaseSprite, { AnimConfig, Direction } from "./BaseSprite";
-import BaseScene from "../scenes/BaseScene";
 import { Collidable } from "../mixins/Collidable";
+import GameScene from "../scenes/GameScene";
+import HealthBar from "../scenes/utils/HealthBar";
 
 export type IPlayer = Player & Collidable;
 
 export default class Player extends BaseSprite {
-  speed: number;
-  jumpRange: number;
-  jumpCount = 0;
-  allowedJumps = 2;
-  cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   animConfigs: AnimConfig = {
     idle: {
       frameRate: 8,
@@ -27,18 +23,36 @@ export default class Player extends BaseSprite {
       frames: [17, 23],
     },
   };
-  constructor(scene: BaseScene, x: number, y: number) {
+  speed: number;
+  jumpRange: number;
+  jumpCount = 0;
+  allowedJumps = 2;
+  hasBeenHit: boolean = false;
+  bounceVelocity: number = 250;
+  hp: HealthBar;
+  health: number = 100;
+  cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  constructor(scene: GameScene, x: number, y: number) {
     super("player", scene, x, y);
     this.setBodySize(this.width - 10, 35);
     this.setOffset(8, 5);
     this.speed = scene.config.playerSpeed;
     this.jumpRange = this.speed * 1.8;
     this.cursors = scene.input.keyboard.createCursorKeys();
+    this.hp = new HealthBar(
+      scene,
+      this.config.leftTopCorner.x + 20,
+      this.config.leftTopCorner.y + 20,
+      this.health
+    );
     super.animate("player", this.animConfigs);
   }
 
   update(time: number, delta: number) {
     super.update(time, delta);
+    if (this.hasBeenHit) {
+      return;
+    }
     const { left, right, space } = this.cursors;
     const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space);
 
@@ -61,6 +75,40 @@ export default class Player extends BaseSprite {
         this.stand();
       }
     }
+  }
+
+  playAnimDamage() {
+    return this.scene.tweens.add({
+      targets: this,
+      duration: 50,
+      repeat: -1,
+      tint: 0xffffff,
+    });
+  }
+
+  takesDamage() {
+    if (this.hasBeenHit) return;
+    this.scene.cameras.main.shake(100, 0.01);
+    this.hasBeenHit = true;
+    this.bounceOff();
+    const hitAnim = this.playAnimDamage();
+    this.health -= 30;
+    this.hp.update(this.health);
+
+    this.scene.time.delayedCall(500, () => {
+      this.hasBeenHit = false;
+      hitAnim.stop();
+      this.clearTint();
+    });
+  }
+
+  bounceOff() {
+    this.setVelocityX(
+      this.body.touching.left ? this.bounceVelocity : -this.bounceVelocity
+    );
+    setTimeout(() => {
+      this.setVelocityY(-this.bounceVelocity);
+    }, 0);
   }
 
   jump() {

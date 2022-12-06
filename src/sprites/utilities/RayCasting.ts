@@ -59,7 +59,12 @@ export class RayCast implements IRayCast {
     const { right, left, bottom } = body;
     const startX = this.sprite.flipX ? left : right;
     const range = this.sprite.flipX ? -castLength : castLength;
-    return line.setTo(startX, body.center.y, startX + range, bottom + 30);
+    return line.setTo(
+      startX,
+      body.center.y,
+      startX + range,
+      bottom + castLength
+    );
   }
 
   drawDebug(layer: Phaser.Tilemaps.TilemapLayer) {

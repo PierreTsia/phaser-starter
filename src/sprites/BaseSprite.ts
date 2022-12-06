@@ -15,7 +15,7 @@ export default class BaseSprite extends Phaser.Physics.Arcade.Sprite {
   speed: number = 300;
   platFormsLayer: Phaser.Tilemaps.TilemapLayer;
   lastUpdatePostion: [number, number] = [0, 0];
-  hasHits: boolean = false;
+  isOnPlatform: boolean = false;
   rayCast: IRayCast;
 
   constructor(key: string, scene: GameScene, x: number, y: number) {
@@ -36,21 +36,21 @@ export default class BaseSprite extends Phaser.Physics.Arcade.Sprite {
   }
 
   update(time: number, delta: number) {
-    super.update(time, delta);
+    if (!this.body) return;
     const { x, y } = this.body;
-    const hasMovedSinceLastUpdate = Phaser.Math.Distance.Between(
+    const moveDist = Phaser.Math.Distance.Between(
       x,
       y,
       ...this.lastUpdatePostion
     );
-    if (hasMovedSinceLastUpdate > 6) {
+    if (moveDist > 6) {
       this.refreshRayCast(x, y);
     }
   }
 
-  private refreshRayCast(x: number, y: number) {
+  refreshRayCast(x: number, y: number) {
     const { hasHits } = this.rayCast.cast();
-    this.hasHits = hasHits;
+    this.isOnPlatform = hasHits;
     this.rayCast.drawDebug(this.platFormsLayer);
     this.lastUpdatePostion = [x, y];
     this.rayCast.resetTileHits();

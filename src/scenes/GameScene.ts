@@ -3,6 +3,8 @@ import { GameConfig } from "../index";
 import Player, { IPlayer } from "../sprites/Player";
 import { WithCollision } from "../mixins/Collidable";
 import { EnemyFactory, EnemyName } from "../sprites/types";
+import Collisions from "./utils/Collisions";
+import { IEnemy } from "../sprites/Enemy";
 
 const LAYERS = ["colliders", "environment", "platforms"] as const;
 const ZONES = ["startZone", "endZone"] as const;
@@ -16,6 +18,7 @@ export default class GameScene extends BaseScene {
   layers!: LayerMap;
   graphics!: Phaser.GameObjects.Graphics;
   line: Phaser.Geom.Line = new Phaser.Geom.Line();
+  collisions: Collisions = new Collisions();
 
   constructor(config: GameConfig) {
     super("GameScene", config);
@@ -34,16 +37,34 @@ export default class GameScene extends BaseScene {
 
   private populateWithEnemies(map: Phaser.Tilemaps.Tilemap) {
     const spawns = this.createSpawningZones(map);
-    spawns.forEach((spawn) => {
-      const enemyName: EnemyName = spawn.properties?.find(
-        (p: { name: string }) => p.name === "enemy"
-      )?.value;
+    spawns.forEach((s) => this.summonEnemy(s));
+  }
 
-      const EnemyClass = EnemyFactory(enemyName);
-      const enemy = new EnemyClass(this, spawn.x!, spawn.y!);
-      enemy.addCollider(this.layers.colliders).addCollider(this.player);
-      enemy.walk(enemy.currentDirection);
-    });
+  summonEnemy(spawn: Phaser.Types.Tilemaps.TiledObject) {
+    const enemy = this.createEnemy(spawn);
+    this.createEnemyColliders(enemy);
+    enemy.walk(enemy.currentDirection);
+  }
+
+  private createEnemyColliders(enemy: IEnemy) {
+    enemy
+      .addCollider(this.layers.colliders)
+      .addCollider(this.player, () =>
+        this.collisions.onPlayerCollidesEnemy(this.player, enemy)
+      );
+  }
+
+  private createEnemy(spawn: Phaser.Types.Tilemaps.TiledObject): IEnemy {
+    const enemyName = this.getEnemyName(spawn);
+    const EnemyClass = EnemyFactory(enemyName);
+    return new EnemyClass(this, spawn.x!, spawn.y!);
+  }
+
+  private getEnemyName(spawn: Phaser.Types.Tilemaps.TiledObject): EnemyName {
+    return (
+      spawn.properties?.find((p: { name: string }) => p.name === "enemy")
+        ?.value ?? "bird"
+    );
   }
 
   private initPlayer(start: Phaser.Types.Tilemaps.TiledObject) {
