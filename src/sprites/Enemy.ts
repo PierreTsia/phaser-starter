@@ -2,6 +2,7 @@ import BaseSprite, { AnimConfig, Direction } from "./BaseSprite";
 import { Collidable } from "../mixins/Collidable";
 import GameScene from "../scenes/GameScene";
 import { IPlayer } from "./Player";
+import EdgeDetectionRay from "./utilities/EdgeDetectionRay";
 
 export type IEnemy = Enemy & Collidable;
 
@@ -12,6 +13,9 @@ export default class Enemy extends BaseSprite {
   currentPatrolDistance: number = 0;
   maxPatrolDistance: number = 100;
   lastTurnTime: number = 0;
+  edgeDetect!: EdgeDetectionRay;
+  isOnPlatform: boolean = false;
+  isTurning: boolean = false;
 
   constructor(
     name: string,
@@ -22,8 +26,10 @@ export default class Enemy extends BaseSprite {
   ) {
     super(name, scene, x, y);
     this.platFormsLayer = scene.layers.platforms;
+    scene.physics.add.existing(this);
 
     this.setImmovable(true);
+    this.edgeDetect = new EdgeDetectionRay(scene, this, scene.layers.colliders);
 
     super.animate(name, anims);
     /*scene.events.on(
@@ -53,41 +59,60 @@ export default class Enemy extends BaseSprite {
     this.play("walk", true);
   }
   attack(direction: Direction) {
-    //this.setBodySize(this.width, 45);
     this.turn(direction);
     this.play("attack", true);
-    //this.setBodySize(this.width + this.meleeRange, this.height);
   }
 
   turnAround(direction: Direction) {
+    this.isTurning = true;
     this.currentDirection = direction === "right" ? "left" : "right";
-    this.turn(this.currentDirection);
-    const directionMultiplier = this.currentDirection === "right" ? 1 : -1;
+    this.stand();
+    this.scene.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        this.turn(this.currentDirection);
+        this.moveToInitialPosition();
+      },
+    });
+
+    this.scene.time.addEvent({
+      delay: 2000,
+      callback: () => {
+        this.isTurning = false;
+        this.walk(this.currentDirection);
+      },
+    });
+  }
+
+  private moveToInitialPosition() {
     this.setPosition(
-      this.x + (directionMultiplier * this.body.width) / 2,
+      this.x + (this.directionMultiplier * this.body.width) / 2,
       this.y
     );
-    this.refreshRayCast(this.x, this.y);
-    this.walk(this.currentDirection);
+  }
+
+  private get directionMultiplier() {
+    return this.currentDirection === "right" ? 1 : -1;
   }
 
   update(time: number, delta: number) {
     super.update(time, delta);
+    this.edgeDetect.refreshRay();
+    this.isOnPlatform = !this.edgeDetect.isOnEdge;
     this.patrol(time);
   }
 
   private patrol(time: number) {
-    const isTurning = time - this.lastTurnTime < 100;
     if (
-      isTurning ||
+      this.isTurning ||
       !this.body ||
       !(this.body as Phaser.Physics.Arcade.Body).onFloor()
     ) {
       return;
     }
     if (!this.isOnPlatform || this.hasReachedXEdge()) {
-      this.turnAround(this.currentDirection);
       this.lastTurnTime = time;
+      this.turnAround(this.currentDirection);
     } else {
       this.walk(this.currentDirection);
     }

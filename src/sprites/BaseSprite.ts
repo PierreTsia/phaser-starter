@@ -1,6 +1,5 @@
 import { GameConfig } from "../index";
 import GameScene from "../scenes/GameScene";
-import { IRayCast, RayCast } from "./utilities/RayCasting";
 
 export type Direction = "left" | "right";
 export interface AnimConfig {
@@ -15,8 +14,6 @@ export default class BaseSprite extends Phaser.Physics.Arcade.Sprite {
   speed: number = 300;
   platFormsLayer: Phaser.Tilemaps.TilemapLayer;
   lastUpdatePostion: [number, number] = [0, 0];
-  isOnPlatform: boolean = false;
-  rayCast: IRayCast;
 
   constructor(key: string, scene: GameScene, x: number, y: number) {
     super(scene, x, y, key);
@@ -27,33 +24,11 @@ export default class BaseSprite extends Phaser.Physics.Arcade.Sprite {
     this.lastUpdatePostion = [x, y];
 
     this.platFormsLayer = scene.layers.platforms;
-    this.rayCast = new RayCast(this, scene, this.platFormsLayer);
 
     this.setOrigin(0.5, 1);
     this.setGravity(0, 800);
     this.setCollideWorldBounds(true);
     scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this);
-  }
-
-  update(time: number, delta: number) {
-    if (!this.body) return;
-    const { x, y } = this.body;
-    const moveDist = Phaser.Math.Distance.Between(
-      x,
-      y,
-      ...this.lastUpdatePostion
-    );
-    if (moveDist > 6) {
-      this.refreshRayCast(x, y);
-    }
-  }
-
-  refreshRayCast(x: number, y: number) {
-    const { hasHits } = this.rayCast.cast();
-    this.isOnPlatform = hasHits;
-    this.rayCast.drawDebug(this.platFormsLayer);
-    this.lastUpdatePostion = [x, y];
-    this.rayCast.resetTileHits();
   }
 
   animate(spriteName: string, animConfig: AnimConfig) {
