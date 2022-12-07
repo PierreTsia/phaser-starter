@@ -228,6 +228,11 @@
     "process" "^0.11.1"
     "util" "^0.10.3"
 
+"phaser-raycaster@^0.10.5":
+  "integrity" "sha512-HQkRstuuQx1OzQYn4R0dndHmF4UasvJ9Zg2zjhd/d5BRtTu8+2D5BqfOsQHW6kvzyaGqyy8dI0WxF3d2MX4oYg=="
+  "resolved" "https://registry.npmjs.org/phaser-raycaster/-/phaser-raycaster-0.10.5.tgz"
+  "version" "0.10.5"
+
 "phaser@^3.55.2":
   "integrity" "sha512-amKXsbb2Ht29dGPKvt1edq3yGGYKtq8373GpJYGKPNPnneYY6MtVTOgjHDuZwtmUyK4v86FugkT3hzW/N4tjxQ=="
   "resolved" "https://registry.npmjs.org/phaser/-/phaser-3.55.2.tgz"

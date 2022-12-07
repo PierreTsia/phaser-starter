@@ -19,20 +19,87 @@ export default class GameScene extends BaseScene {
   graphics!: Phaser.GameObjects.Graphics;
   line: Phaser.Geom.Line = new Phaser.Geom.Line();
   collisions: Collisions = new Collisions();
+  raycasterPlugin!: PhaserRaycaster;
+  raycaster!: Raycaster;
+  ray!: Raycaster.Ray;
+  lastUpdate = 0;
 
   constructor(config: GameConfig) {
     super("GameScene", config);
   }
 
   create() {
+    this.raycaster = this.raycasterPlugin.createRaycaster({
+      boundingBox: new Phaser.Geom.Rectangle(
+        0,
+        0,
+        this.config.mapWidth,
+        this.config.mapHeight
+      ),
+      debug: {
+        enabled: true, //enable debug mode
+        maps: true, //enable maps debug
+        rays: true, //enable rays debug
+        graphics: {
+          ray: 0x00ff00, //debug ray color; set false to disable
+          rayPoint: 0xff00ff, //debug ray point color; set false to disable
+          mapPoint: 0x00ffff, //debug map point color; set false to disable
+          mapSegment: 0x0000ff, //debug map segment color; set false to disable
+          mapBoundingBox: 0xff0000, //debug map bounding box color; set false to disable
+        },
+      },
+    });
+
     const map = this.createMap();
     this.layers = this.createLayers(map);
     const { start, end } = this.createPlayerZones(map);
     this.initPlayer(start);
+
+    // TODO TEMP RAY
+
+    console.log(this.layers.colliders);
+    console.log(this.layers.colliders.tileset);
+    this.raycaster.mapGameObjects(this.layers.colliders, false, {
+      collisionTiles: [...Array(this.layers.colliders.tileset[0].total).keys()],
+    });
+    //console.log(this.raycaster);
+
+    this.ray = this.raycaster.createRay({ detectionRange: 200 });
+
     this.initEndOfLevel(end);
     this.initCameras();
     this.physics.world.setBounds(...this.bounds);
     this.populateWithEnemies(map);
+  }
+
+  update(supertime: number, delta: number) {
+    //this.ray.autoSlice = true;
+    //enable arcade physics body
+    this.ray.enablePhysics();
+    this.ray.setOrigin(this.player.body.center.x, this.player.body.center.y);
+    this.ray.setAngle(this.player.visionAngle);
+    const intersections = (this.ray.cast() as Phaser.Geom.Point) && {
+      object: Phaser.GameObjects.GameObject,
+    };
+
+    // execute only after one second
+    let timeSinceLastUpdate = supertime - this.lastUpdate;
+    if (timeSinceLastUpdate > 5000) {
+      // console.log(supertime, delta);
+      //enable auto slicing field of view
+
+      // console.log("===>", visibleObjects);
+      console.log(intersections);
+      // console.log(intersections instanceof Phaser.Geom.Point);
+      // ddistance between player and first intersection
+
+      if (!intersections?.object) {
+        this.player.setTint(0xff0000);
+      } else {
+        this.player.clearTint();
+      }
+      this.lastUpdate = supertime;
+    }
   }
 
   private populateWithEnemies(map: Phaser.Tilemaps.Tilemap) {

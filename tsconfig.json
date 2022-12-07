@@ -15,5 +15,8 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["./src/**/*"]
+  "include": [
+    "./src/**/*",
+    "node_modules/phaser-raycaster/types/types.d.ts"
+  ]
 }

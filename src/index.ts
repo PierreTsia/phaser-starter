@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-
+import PhaserRaycaster from "phaser-raycaster";
 import GameScene from "./scenes/GameScene";
 import PreloadAssets from "./scenes/PreloadAssets";
 
@@ -16,6 +16,8 @@ export type GameConfig = typeof SHARED_CONFIG;
 const SHARED_CONFIG = {
   width: WIDTH,
   height: HEIGHT,
+  mapWidth: MAP_WIDTH,
+  mapHeight: MAP_HEIGHT,
   mapOffsetX: MAP_WIDTH > WIDTH ? MAP_WIDTH - WIDTH : 0,
   mapOffsetY: MAP_HEIGHT > HEIGHT ? MAP_HEIGHT - HEIGHT : 0,
   zoomFactor: ZOOM_FACTOR,
@@ -46,6 +48,15 @@ const config = {
     },
   },
   scene: initScenes(),
+  plugins: {
+    scene: [
+      {
+        key: "PhaserRaycaster",
+        plugin: PhaserRaycaster,
+        mapping: "raycasterPlugin",
+      },
+    ],
+  },
 };
 
 new Phaser.Game(config);
