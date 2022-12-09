@@ -2,9 +2,10 @@ import GameScene from "../scenes/GameScene";
 import { Direction } from "./BaseSprite";
 
 export default class Projectile extends Phaser.Physics.Arcade.Sprite {
-  speed: number = 300;
+  speed: number = 200;
   traveledDistance: number = 0;
   maxDistance = 200;
+
   constructor(scene: GameScene, x: number, y: number, key: string) {
     super(scene, x, y, key);
 
