@@ -2,6 +2,7 @@ import BaseSprite, { AnimConfig, Direction } from "./BaseSprite";
 import { Collidable } from "../mixins/Collidable";
 import GameScene from "../scenes/GameScene";
 import HealthBar from "../scenes/utils/HealthBar";
+import Projectiles from "./Projectiles";
 
 export type IPlayer = Player & Collidable;
 
@@ -32,6 +33,7 @@ export default class Player extends BaseSprite {
   hp: HealthBar;
   health: number = 100;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  projectiles: Projectiles;
   constructor(scene: GameScene, x: number, y: number) {
     super("player", scene, x, y);
     this.setBodySize(this.width - 10, 35);
@@ -39,6 +41,14 @@ export default class Player extends BaseSprite {
     this.speed = scene.config.playerSpeed;
     this.jumpRange = this.speed * 1.8;
     this.cursors = scene.input.keyboard.createCursorKeys();
+    this.projectiles = new Projectiles(scene);
+    scene.input.keyboard.on("keydown-Q", () => {
+      this.projectiles.fireProjectile(
+        this.body.center.x,
+        this.body.center.y,
+        this.isFacingLeft ? "left" : "right"
+      );
+    });
     this.hp = new HealthBar(
       scene,
       this.config.leftTopCorner.x + 20,

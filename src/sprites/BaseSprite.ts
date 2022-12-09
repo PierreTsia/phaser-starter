@@ -78,12 +78,8 @@ export default class BaseSprite extends Phaser.Physics.Arcade.Sprite {
     return this.flipX;
   }
 
-  get frontX(): number {
-    return this.isFacingLeft ? this.body.left : this.body.left + this.width;
-  }
-
-  get visionAngle() {
-    return this.isFacingLeft ? 90 : 45;
+  get watchYourFeetAngle() {
+    return this.isFacingLeft ? 120 : 60;
   }
 
   hasReachedXEdge() {

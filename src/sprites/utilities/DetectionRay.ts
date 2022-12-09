@@ -47,10 +47,10 @@ export default class DetectionRay {
     this.ray.enablePhysics();
   }
 
-  refreshRay() {
+  refreshRay(angle: number = this.source.watchYourFeetAngle) {
     if (!this.source?.body) return;
+    this.ray.setAngleDeg(angle);
     this.ray.setOrigin(this.source.body.center.x, this.source.body.center.y);
-    this.ray.setAngle(this.source.visionAngle);
     const intersections = this.ray.castCone() as Array<IPoint>;
     this.intersects = intersections.filter((i) => i.object);
   }
