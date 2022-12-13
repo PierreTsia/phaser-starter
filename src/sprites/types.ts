@@ -1,5 +1,5 @@
-import Birdman from "./Birdman";
-import Snakeman from "./Snakeman";
+import Birdman from "./mobs/Birdman";
+import Snakeman from "./mobs/Snakeman";
 import { WithCollision } from "../mixins/Collidable";
 
 const Enemies = {

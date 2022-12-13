@@ -1,6 +1,6 @@
 import Enemy from "./Enemy";
-import { AnimConfig, Direction } from "./BaseSprite";
-import GameScene from "../scenes/GameScene";
+import { AnimConfig, Direction } from "../BaseSprite";
+import GameScene from "../../scenes/GameScene";
 const animConfigs: AnimConfig = {
   walk: {
     frameRate: 8,
@@ -26,6 +26,7 @@ export default class Birdman extends Enemy {
   }
 
   turn(direction: Direction) {
+    if (!this.body) return;
     super.turn(direction);
     this.adjustOffset(direction);
   }

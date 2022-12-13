@@ -1,8 +1,9 @@
-import BaseSprite, { AnimConfig, Direction } from "./BaseSprite";
-import { Collidable } from "../mixins/Collidable";
-import GameScene from "../scenes/GameScene";
-import { IPlayer } from "./Player";
-import EdgeDetectionRay from "./utilities/EdgeDetectionRay";
+import BaseSprite, { AnimConfig, Direction } from "../BaseSprite";
+import { Collidable } from "../../mixins/Collidable";
+import GameScene from "../../scenes/GameScene";
+import { IPlayer } from "../Player";
+import EdgeDetectionRay from "../utilities/EdgeDetectionRay";
+import Projectile from "../spells/Projectile";
 
 export type IEnemy = Enemy & Collidable;
 
@@ -16,6 +17,7 @@ export default class Enemy extends BaseSprite {
   edgeDetect!: EdgeDetectionRay;
   isOnPlatform: boolean = false;
   isTurning: boolean = false;
+  private _health: number = 100;
 
   constructor(
     name: string,
@@ -54,7 +56,23 @@ export default class Enemy extends BaseSprite {
     }
   }
 
+  takesHit(source: Projectile) {
+    this._health -= source.damage;
+    source.deliversHit();
+    if (this._health <= 0) {
+      this.die();
+    }
+  }
+
+  die() {
+    this.setActive(false);
+    this.setVisible(false);
+    this.body.reset(0, 0);
+    this.destroy(true);
+  }
+
   walk(direction: Direction) {
+    if (!this.body) return;
     super.walk(direction);
     this.play("walk", true);
   }
@@ -85,6 +103,7 @@ export default class Enemy extends BaseSprite {
   }
 
   private moveToInitialPosition() {
+    if (!this.body) return;
     this.setPosition(
       this.x + (this.directionMultiplier * this.body.width) / 2,
       this.y
@@ -96,6 +115,9 @@ export default class Enemy extends BaseSprite {
   }
 
   update(time: number, delta: number) {
+    if (!this.body) {
+      return;
+    }
     super.update(time, delta);
     this.edgeDetect.refreshRay();
     this.isOnPlatform = !this.edgeDetect.isOnEdge;

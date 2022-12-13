@@ -1,5 +1,5 @@
 import { IPlayer } from "../../sprites/Player";
-import { IEnemy } from "../../sprites/Enemy";
+import { IEnemy } from "../../sprites/mobs/Enemy";
 
 export default class Collisions {
   onPlayerCollidesEnemy = (player: IPlayer, enemy: IEnemy) => {

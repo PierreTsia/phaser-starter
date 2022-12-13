@@ -15,6 +15,15 @@ export default class PreloadAssets extends BaseScene {
       spacing: 32,
       frameHeight: 38,
     });
+    this.load.spritesheet(
+      "player_attack",
+      "assets/player/throw_attack_sheet_1.png",
+      {
+        frameWidth: 32,
+        spacing: 32,
+        frameHeight: 38,
+      }
+    );
     this.load.spritesheet("bird_man", "assets/enemy/enemy_sheet.png", {
       frameWidth: 64,
       frameHeight: 64,

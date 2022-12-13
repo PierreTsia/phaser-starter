@@ -4,7 +4,12 @@ import Player, { IPlayer } from "../sprites/Player";
 import { WithCollision } from "../mixins/Collidable";
 import { EnemyFactory, EnemyName } from "../sprites/types";
 import Collisions from "./utils/Collisions";
-import { IEnemy } from "../sprites/Enemy";
+import { IEnemy } from "../sprites/mobs/Enemy";
+import IceBallSpell from "../sprites/spells/IceBallSpell";
+import GameObjectWithBody = Phaser.Types.Physics.Arcade.GameObjectWithBody;
+import Projectile from "../sprites/spells/Projectile";
+
+type ProjectileObject = Phaser.GameObjects.GameObject & IceBallSpell;
 
 const LAYERS = ["colliders", "environment", "platforms"] as const;
 const ZONES = ["startZone", "endZone"] as const;
@@ -53,8 +58,16 @@ export default class GameScene extends BaseScene {
       .addCollider(this.layers.colliders)
       .addCollider(this.player, () =>
         this.collisions.onPlayerCollidesEnemy(this.player, enemy)
+      )
+      .addCollider(
+        this.player.projectiles as ProjectileObject,
+        this.onWeaponHit
       );
   }
+
+  onWeaponHit = (enemy: GameObjectWithBody, projectile: GameObjectWithBody) => {
+    (enemy as IEnemy).takesHit(projectile as Projectile);
+  };
 
   private createEnemy(spawn: Phaser.Types.Tilemaps.TiledObject): IEnemy {
     const enemyName = this.getEnemyName(spawn);

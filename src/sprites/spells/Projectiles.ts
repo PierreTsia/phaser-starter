@@ -1,12 +1,13 @@
 import Phaser from "phaser";
 import Projectile from "./Projectile";
-import GameScene from "../scenes/GameScene";
-import { Direction } from "./BaseSprite";
+import GameScene from "../../scenes/GameScene";
+import { Direction } from "../BaseSprite";
 
 interface ProjectileConfig {
   coolDown: number;
   speed: number;
   range: number;
+  damage: number;
 }
 
 export default class Projectiles extends Phaser.Physics.Arcade.Group {
@@ -14,11 +15,13 @@ export default class Projectiles extends Phaser.Physics.Arcade.Group {
   lastShot: number = 0;
   speed: number = 200;
   range: number = 200;
+  damage: number = 10;
   constructor(scene: GameScene, spriteKey: string, config?: ProjectileConfig) {
     super(scene.physics.world, scene);
     config?.speed && (this.speed = config.speed);
     config?.coolDown && (this.coolDown = config.coolDown);
     config?.range && (this.range = config.range);
+    config?.damage && (this.damage = config.damage);
 
     this.createMultiple({
       frameQuantity: 5,
@@ -41,6 +44,7 @@ export default class Projectiles extends Phaser.Physics.Arcade.Group {
     (this.getChildren() as Projectile[]).forEach((projectile: Projectile) => {
       projectile.speed = this.speed;
       projectile.maxDistance = this.range;
+      projectile.damage = this.damage;
     });
   }
 
@@ -50,7 +54,6 @@ export default class Projectiles extends Phaser.Physics.Arcade.Group {
     if (now - this.lastShot < this.coolDown || !projectile) {
       return;
     }
-
     projectile.fire(x, y, direction);
     this.lastShot = now;
   }

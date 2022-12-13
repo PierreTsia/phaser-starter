@@ -2,12 +2,17 @@ import BaseSprite, { AnimConfig, Direction } from "./BaseSprite";
 import { Collidable } from "../mixins/Collidable";
 import GameScene from "../scenes/GameScene";
 import HealthBar from "../scenes/utils/HealthBar";
-import IceBallSpell from "./IceBallSpell";
+import IceBallSpell from "./spells/IceBallSpell";
 
 export type IPlayer = Player & Collidable;
 
 export default class Player extends BaseSprite {
   animConfigs: AnimConfig = {
+    spellCast: {
+      frames: [0, 6],
+      frameRate: 14,
+      repeat: 0,
+    },
     idle: {
       frameRate: 8,
       repeat: -1,
@@ -42,20 +47,26 @@ export default class Player extends BaseSprite {
     this.jumpRange = this.speed * 1.8;
     this.cursors = scene.input.keyboard.createCursorKeys();
     this.projectiles = new IceBallSpell(scene);
-    scene.input.keyboard.on("keydown-Q", () => {
-      this.projectiles.fireProjectile(
-        this.body.center.x,
-        this.body.center.y,
-        this.isFacingLeft ? "left" : "right"
-      );
-    });
+    scene.input.keyboard.on("keydown-Q", this.castIceBall, this);
     this.hp = new HealthBar(
       scene,
       this.config.leftTopCorner.x + 20,
       this.config.leftTopCorner.y + 20,
       this.health
     );
-    super.animate("player", this.animConfigs);
+
+    const { spellCast, ...rest } = this.animConfigs;
+    super.animate("player", rest);
+    super.animate("player_attack", { spellCast });
+  }
+
+  private castIceBall() {
+    this.play("spellCast", true);
+    this.projectiles.fireProjectile(
+      this.body.center.x,
+      this.body.center.y,
+      this.isFacingLeft ? "left" : "right"
+    );
   }
 
   update(time: number, delta: number) {
@@ -65,6 +76,10 @@ export default class Player extends BaseSprite {
     }
     const { left, right, space } = this.cursors;
     const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space);
+
+    if (this.anims.isPlaying && this.anims.currentAnim.key === "spellCast") {
+      return;
+    }
 
     if (!this.isOnTheGround()) {
       this.play("jump", true);

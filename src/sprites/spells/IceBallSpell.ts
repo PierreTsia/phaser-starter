@@ -1,13 +1,13 @@
-import GameScene from "../scenes/GameScene";
+import GameScene from "../../scenes/GameScene";
 import Projectiles from "./Projectiles";
 
 export default class IceBallSpell extends Projectiles {
   constructor(scene: GameScene) {
     super(scene, "iceball", {
-      coolDown: 600,
-      speed: 800,
+      coolDown: 200,
+      speed: 500,
       range: 400,
+      damage: 50,
     });
-    this.coolDown = 100;
   }
 }
