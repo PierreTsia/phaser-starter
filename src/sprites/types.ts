@@ -18,7 +18,7 @@ export enum SpriteAnimations {
   attack = "attack",
   damaged = "damaged",
   jump = "jump",
-  spell_cast = "spell_cast",
+  throw = "throw",
   run = "run",
   hit_effect = "hit_effect",
 }

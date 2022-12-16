@@ -13,11 +13,24 @@ export function WithCollision<TBase extends SpriteConstructor>(Base: TBase) {
       this.scene.physics.add.collider(this, object, callback, undefined, this);
       return this;
     }
+
+    addOverlap(
+      object: Phaser.GameObjects.GameObject,
+      callback?: ArcadePhysicsCallback
+    ) {
+      this.scene.physics.add.overlap(this, object, callback, undefined, this);
+      return this;
+    }
   };
 }
 
 export interface Collidable {
   addCollider: (
+    object: Phaser.GameObjects.GameObject,
+    callback?: ArcadePhysicsCallback
+  ) => this;
+
+  addOverlap: (
     object: Phaser.GameObjects.GameObject,
     callback?: ArcadePhysicsCallback
   ) => this;

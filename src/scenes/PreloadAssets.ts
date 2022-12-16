@@ -15,6 +15,7 @@ export default class PreloadAssets extends BaseScene {
       spacing: 32,
       frameHeight: 38,
     });
+
     this.load.spritesheet(
       "player_attack",
       "assets/player/throw_attack_sheet_1.png",
@@ -25,10 +26,6 @@ export default class PreloadAssets extends BaseScene {
       }
     );
 
-    this.load.spritesheet("hit_effect", "assets/weapons/hit_effect_sheet.png", {
-      frameWidth: 32,
-      spacing: 32,
-    });
     this.load.spritesheet("bird_man", "assets/enemy/enemy_sheet.png", {
       frameWidth: 64,
       frameHeight: 64,
@@ -37,6 +34,17 @@ export default class PreloadAssets extends BaseScene {
     this.load.spritesheet("snake_man", "assets/enemy/enemy_sheet_2.png", {
       frameWidth: 64,
       frameHeight: 64,
+    });
+
+    this.load.spritesheet("hit_effect", "assets/weapons/hit_effect_sheet.png", {
+      frameWidth: 32,
+      spacing: 32,
+    });
+
+    this.load.spritesheet("sword_attack", "assets/weapons/sword_sheet_1.png", {
+      frameWidth: 52,
+      frameHeight: 32,
+      spacing: 16,
     });
   }
   create() {

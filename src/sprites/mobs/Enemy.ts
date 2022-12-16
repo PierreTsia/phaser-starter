@@ -2,8 +2,9 @@ import BaseSprite, { AnimConfig, Direction } from "../BaseSprite";
 import { Collidable } from "../../mixins/Collidable";
 import GameScene from "../../scenes/GameScene";
 import EdgeDetectionRay from "../utilities/EdgeDetectionRay";
-import Projectile from "../spells/Projectile";
+import Projectile from "../weapons/Projectile";
 import { SpriteAnimations } from "../types";
+import MeleeWeapon from "../weapons/MeleeWeapon";
 
 export type IEnemy = Enemy & Collidable;
 const animConfigs: AnimConfig = {
@@ -43,11 +44,10 @@ export default class Enemy extends BaseSprite {
     super.animate(name, { ...anims, ...animConfigs });
   }
 
-  takesHit(source: Projectile) {
+  takesHit(source: Projectile | MeleeWeapon) {
+    this.play(SpriteAnimations.damaged, true);
     this._health -= source.damage;
     source.deliversHit(this);
-    this.anims.play(SpriteAnimations.hit_effect, true);
-    this.anims.play(SpriteAnimations.damaged, true);
     if (this._health <= 0) {
       this.terminate();
     }
@@ -104,7 +104,7 @@ export default class Enemy extends BaseSprite {
   }
 
   update(time: number, delta: number) {
-    if (!this.body) {
+    if (!this.body || this.isAnimPlaying(SpriteAnimations.damaged)) {
       return;
     }
     if (this.isOutOfScene) {
@@ -114,9 +114,6 @@ export default class Enemy extends BaseSprite {
     super.update(time, delta);
     this.edgeDetect.refreshRay();
     this.isOnPlatform = !this.edgeDetect.isOnEdge;
-    if (this.isAnimPlaying(SpriteAnimations.damaged)) {
-      return;
-    }
     this.patrol(time);
   }
 

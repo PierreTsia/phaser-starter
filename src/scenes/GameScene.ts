@@ -5,11 +5,10 @@ import { WithCollision } from "../mixins/Collidable";
 import { EnemyFactory, EnemyName } from "../sprites/types";
 import Collisions from "./utils/Collisions";
 import { IEnemy } from "../sprites/mobs/Enemy";
-import IceBallSpell from "../sprites/spells/IceBallSpell";
 import GameObjectWithBody = Phaser.Types.Physics.Arcade.GameObjectWithBody;
-import Projectile from "../sprites/spells/Projectile";
-
-type ProjectileObject = Phaser.GameObjects.GameObject & IceBallSpell;
+import debounce from "lodash/debounce";
+import Projectile from "../sprites/weapons/Projectile";
+import MeleeWeapon from "../sprites/weapons/MeleeWeapon";
 
 const LAYERS = ["colliders", "environment", "platforms"] as const;
 const ZONES = ["startZone", "endZone"] as const;
@@ -60,13 +59,23 @@ export default class GameScene extends BaseScene {
         this.collisions.onPlayerCollidesEnemy(this.player, enemy)
       )
       .addCollider(
-        this.player.projectiles as ProjectileObject,
+        // @ts-ignore
+        this.player.projectiles,
+        // @ts-ignore
         this.onWeaponHit
+      )
+      .addOverlap(
+        this.player.meleeWeapon,
+        // @ts-ignore
+        debounce(this.onWeaponHit, 20)
       );
   }
 
-  onWeaponHit = (enemy: GameObjectWithBody, projectile: GameObjectWithBody) => {
-    (enemy as IEnemy).takesHit(projectile as Projectile);
+  onWeaponHit = (
+    enemy: GameObjectWithBody,
+    weapon: Projectile | MeleeWeapon
+  ) => {
+    (enemy as IEnemy).takesHit(weapon);
   };
 
   private createEnemy(spawn: Phaser.Types.Tilemaps.TiledObject): IEnemy {

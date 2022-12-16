@@ -2,14 +2,16 @@ import BaseSprite, { AnimConfig, Direction } from "./BaseSprite";
 import { Collidable } from "../mixins/Collidable";
 import GameScene from "../scenes/GameScene";
 import HealthBar from "../scenes/utils/HealthBar";
-import IceBallSpell from "./spells/IceBallSpell";
+import IceBallSpell from "./weapons/IceBallSpell";
+import MeleeWeapon from "./weapons/MeleeWeapon";
 import { SpriteAnimations } from "./types";
+import Sword from "./weapons/Sword";
 
 export type IPlayer = Player & Collidable;
 
 export default class Player extends BaseSprite {
   animConfigs: AnimConfig = {
-    spell_cast: {
+    throw: {
       frames: [0, 6],
       frameRate: 14,
       repeat: 0,
@@ -40,15 +42,19 @@ export default class Player extends BaseSprite {
   health: number = 100;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   projectiles: IceBallSpell;
+  meleeWeapon: MeleeWeapon;
   constructor(scene: GameScene, x: number, y: number) {
     super("player", scene, x, y);
     this.setBodySize(this.width - 10, 35);
     this.setOffset(8, 5);
     this.speed = scene.config.playerSpeed;
     this.jumpRange = this.speed * 1.8;
-    this.cursors = scene.input.keyboard.createCursorKeys();
     this.projectiles = new IceBallSpell(scene);
+    this.meleeWeapon = new Sword(scene);
+    this.cursors = scene.input.keyboard.createCursorKeys();
     scene.input.keyboard.on("keydown-Q", this.castIceBall, this);
+    scene.input.keyboard.on("keydown-E", this.meleeAtack, this);
+
     this.hp = new HealthBar(
       scene,
       this.config.leftTopCorner.x + 20,
@@ -56,13 +62,22 @@ export default class Player extends BaseSprite {
       this.health
     );
 
-    const { spell_cast, ...rest } = this.animConfigs;
+    // throw is a reserved word in JS
+    const { throw: throwAttack, ...rest } = this.animConfigs;
     super.animate("player", rest);
-    super.animate("player_attack", { spell_cast });
+    super.animate("player_attack", { throw: throwAttack });
+  }
+
+  private meleeAtack() {
+    if (this.meleeWeapon.canSwing()) {
+      this.play(SpriteAnimations.throw, true);
+      console.log("melee atack");
+      this.meleeWeapon.swing(this, this.isFacingLeft ? "left" : "right");
+    }
   }
 
   private castIceBall() {
-    this.play(SpriteAnimations.spell_cast, true);
+    this.play(SpriteAnimations.throw, true);
     this.projectiles.fireProjectile(
       this.body.center.x,
       this.body.center.y,
@@ -83,7 +98,7 @@ export default class Player extends BaseSprite {
     const { left, right, space } = this.cursors;
     const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space);
 
-    if (this.isAnimPlaying(SpriteAnimations.spell_cast)) {
+    if (this.isAnimPlaying(SpriteAnimations.throw)) {
       return;
     }
 
