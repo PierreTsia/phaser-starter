@@ -17,6 +17,11 @@ const animConfigs: AnimConfig = {
     repeat: -1,
     frames: [15, 20],
   },
+  damaged: {
+    frameRate: 8,
+    repeat: 0,
+    frames: [21, 23],
+  },
 };
 export default class Snakeman extends Enemy {
   constructor(scene: GameScene, x: number, y: number) {
@@ -32,6 +37,7 @@ export default class Snakeman extends Enemy {
   }
 
   turn(direction: Direction) {
+    if (!this.body) return;
     super.turn(direction);
     this.adjustOffset(direction);
   }

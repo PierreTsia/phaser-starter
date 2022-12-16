@@ -1,5 +1,8 @@
 import GameScene from "../../scenes/GameScene";
 import { Direction } from "../BaseSprite";
+import Sprite = Phaser.GameObjects.Sprite;
+import EffectManager from "../effects/EffectManager";
+import { SpriteAnimations } from "../types";
 
 export default class Projectile extends Phaser.Physics.Arcade.Sprite {
   speed: number = 200;
@@ -12,6 +15,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
+    this.body.setSize(this.width - 13, this.height - 20);
   }
 
   fire(x: number, y: number, direction: Direction = "right") {
@@ -22,10 +26,13 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     this.setVelocityX(velocity);
   }
 
-  deliversHit() {
+  deliversHit(target: Sprite) {
     this.activateProjectile(false);
     this.traveledDistance = 0;
+    const impactPosition = { x: this.x, y: this.y };
     this.body.reset(0, 0);
+    const effect = new EffectManager(this.scene);
+    effect.playEffectOn(SpriteAnimations.hit_effect, target, impactPosition);
   }
 
   activateProjectile(value: boolean) {
@@ -41,6 +48,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     if (this.traveledDistance >= this.maxDistance) {
       this.activateProjectile(false);
       this.traveledDistance = 0;
+      this.body?.reset(0, 0);
     }
   }
 }

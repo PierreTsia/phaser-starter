@@ -1,9 +1,9 @@
 import BaseSprite, { AnimConfig, Direction } from "../BaseSprite";
 import { Collidable } from "../../mixins/Collidable";
 import GameScene from "../../scenes/GameScene";
-import { IPlayer } from "../Player";
 import EdgeDetectionRay from "../utilities/EdgeDetectionRay";
 import Projectile from "../spells/Projectile";
+import { SpriteAnimations } from "../types";
 
 export type IEnemy = Enemy & Collidable;
 
@@ -34,31 +34,13 @@ export default class Enemy extends BaseSprite {
     this.edgeDetect = new EdgeDetectionRay(scene, this, scene.layers.colliders);
 
     super.animate(name, anims);
-    /*scene.events.on(
-      Phaser.Scenes.Events.UPDATE,
-      () => this.detectPlayerProximity(scene.player),
-      this
-    );*/
-  }
-
-  detectPlayerProximity(player: IPlayer) {
-    const distance = Phaser.Math.Distance.Between(
-      this.x,
-      this.y,
-      player.x,
-      player.y
-    );
-
-    if (distance < 100) {
-      const direction = this.x > player.x ? "left" : "right";
-      this.setVelocityX(0);
-      this.attack(direction);
-    }
   }
 
   takesHit(source: Projectile) {
     this._health -= source.damage;
-    source.deliversHit();
+    source.deliversHit(this);
+    this.anims.play(SpriteAnimations.hit_effect, true);
+    this.anims.play(SpriteAnimations.damaged, true);
     if (this._health <= 0) {
       this.die();
     }
@@ -74,32 +56,23 @@ export default class Enemy extends BaseSprite {
   walk(direction: Direction) {
     if (!this.body) return;
     super.walk(direction);
-    this.play("walk", true);
+    this.play(SpriteAnimations.walk, true);
   }
   attack(direction: Direction) {
     this.turn(direction);
-    this.play("attack", true);
+    this.play(SpriteAnimations.attack, true);
   }
 
   turnAround(direction: Direction) {
     this.isTurning = true;
     this.currentDirection = direction === "right" ? "left" : "right";
     this.stand();
-    this.scene.time.addEvent({
-      delay: 1000,
-      callback: () => {
-        this.turn(this.currentDirection);
-        this.moveToInitialPosition();
-      },
-    });
 
-    this.scene.time.addEvent({
-      delay: 2000,
-      callback: () => {
-        this.isTurning = false;
-        this.walk(this.currentDirection);
-      },
-    });
+    this.turn(this.currentDirection);
+    this.moveToInitialPosition();
+
+    this.isTurning = false;
+    this.walk(this.currentDirection);
   }
 
   private moveToInitialPosition() {
@@ -114,6 +87,11 @@ export default class Enemy extends BaseSprite {
     return this.currentDirection === "right" ? 1 : -1;
   }
 
+  stand() {
+    super.stand();
+    this.play(SpriteAnimations.idle, true);
+  }
+
   update(time: number, delta: number) {
     if (!this.body) {
       return;
@@ -121,6 +99,9 @@ export default class Enemy extends BaseSprite {
     super.update(time, delta);
     this.edgeDetect.refreshRay();
     this.isOnPlatform = !this.edgeDetect.isOnEdge;
+    if (this.anims.isPlaying && this.anims.currentAnim.key === "damaged") {
+      return;
+    }
     this.patrol(time);
   }
 

@@ -3,12 +3,13 @@ import { Collidable } from "../mixins/Collidable";
 import GameScene from "../scenes/GameScene";
 import HealthBar from "../scenes/utils/HealthBar";
 import IceBallSpell from "./spells/IceBallSpell";
+import { SpriteAnimations } from "./types";
 
 export type IPlayer = Player & Collidable;
 
 export default class Player extends BaseSprite {
   animConfigs: AnimConfig = {
-    spellCast: {
+    spell_cast: {
       frames: [0, 6],
       frameRate: 14,
       repeat: 0,
@@ -55,13 +56,13 @@ export default class Player extends BaseSprite {
       this.health
     );
 
-    const { spellCast, ...rest } = this.animConfigs;
+    const { spell_cast, ...rest } = this.animConfigs;
     super.animate("player", rest);
-    super.animate("player_attack", { spellCast });
+    super.animate("player_attack", { spell_cast });
   }
 
   private castIceBall() {
-    this.play("spellCast", true);
+    this.play(SpriteAnimations.spell_cast, true);
     this.projectiles.fireProjectile(
       this.body.center.x,
       this.body.center.y,
@@ -77,12 +78,12 @@ export default class Player extends BaseSprite {
     const { left, right, space } = this.cursors;
     const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space);
 
-    if (this.anims.isPlaying && this.anims.currentAnim.key === "spellCast") {
+    if (this.anims.isPlaying && this.anims.currentAnim.key === "spell_cast") {
       return;
     }
 
     if (!this.isOnTheGround()) {
-      this.play("jump", true);
+      this.play(SpriteAnimations.jump, true);
       const canDoubleJump = this.jumpCount < this.allowedJumps;
       if (isSpaceJustDown && canDoubleJump) {
         this.jump();
@@ -143,6 +144,6 @@ export default class Player extends BaseSprite {
 
   run(direction: Direction) {
     super.run(direction);
-    this.play("run", true);
+    this.play(SpriteAnimations.run, true);
   }
 }

@@ -71,7 +71,6 @@ export default class BaseSprite extends Phaser.Physics.Arcade.Sprite {
   }
   stand() {
     this.setVelocityX(0);
-    this.play("idle", true);
   }
 
   get isFacingLeft() {

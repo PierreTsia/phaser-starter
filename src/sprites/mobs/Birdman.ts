@@ -17,6 +17,11 @@ const animConfigs: AnimConfig = {
     repeat: 1,
     frames: [12, 24],
   },
+  damaged: {
+    frameRate: 8,
+    repeat: 0,
+    frames: [25, 27],
+  },
 };
 export default class Birdman extends Enemy {
   constructor(scene: GameScene, x: number, y: number) {

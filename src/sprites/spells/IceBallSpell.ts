@@ -7,7 +7,7 @@ export default class IceBallSpell extends Projectiles {
       coolDown: 200,
       speed: 500,
       range: 400,
-      damage: 50,
+      damage: 30,
     });
   }
 }
