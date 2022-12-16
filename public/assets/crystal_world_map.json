@@ -226,13 +226,67 @@
                         {
                          "name":"enemy",
                          "type":"string",
+                         "value":"snake"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":1014.66666666667,
+                 "y":330.666666666667
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":8,
+                 "name":"",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"enemy",
+                         "type":"string",
                          "value":"bird"
                         }],
                  "rotation":0,
                  "visible":true,
                  "width":0,
-                 "x":297.333333333333,
-                 "y":331.333333333333
+                 "x":558.666666666667,
+                 "y":201.333333333333
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":9,
+                 "name":"",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"enemy",
+                         "type":"string",
+                         "value":"snake"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":1082,
+                 "y":600
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":10,
+                 "name":"",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"enemy",
+                         "type":"string",
+                         "value":"bird"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":576,
+                 "y":330
                 }],
          "opacity":1,
          "properties":[
@@ -247,7 +301,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":8,
+ "nextobjectid":11,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.2",
