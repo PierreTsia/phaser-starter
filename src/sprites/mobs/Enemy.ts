@@ -49,15 +49,15 @@ export default class Enemy extends BaseSprite {
     this.anims.play(SpriteAnimations.hit_effect, true);
     this.anims.play(SpriteAnimations.damaged, true);
     if (this._health <= 0) {
-      this.die();
+      this.terminate();
     }
   }
 
-  die() {
-    this.setActive(false);
-    this.setVisible(false);
-    this.body.reset(0, 0);
-    this.destroy(true);
+  terminate() {
+    this.setTint(0xff0000);
+    this.setVelocity(0, -200);
+    this.body.checkCollision.none = true;
+    this.setCollideWorldBounds(false);
   }
 
   walk(direction: Direction) {
@@ -99,8 +99,16 @@ export default class Enemy extends BaseSprite {
     this.play(SpriteAnimations.idle, true);
   }
 
+  get isOutOfScene() {
+    return this.getBounds().top > this.config.mapHeight;
+  }
+
   update(time: number, delta: number) {
     if (!this.body) {
+      return;
+    }
+    if (this.isOutOfScene) {
+      this.destroy();
       return;
     }
     super.update(time, delta);
