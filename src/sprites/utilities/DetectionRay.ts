@@ -40,8 +40,6 @@ export default class DetectionRay {
       this.raycaster.mapGameObjects(target, false, {
         collisionTiles: [...Array(target.tileset[0].total).keys()],
       });
-    } else {
-      this.raycaster.mapGameObjects(target);
     }
     this.ray = this.raycaster.createRay({ detectionRange: 50 });
     this.ray.enablePhysics();

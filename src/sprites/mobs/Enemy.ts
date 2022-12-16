@@ -128,7 +128,7 @@ export default class Enemy extends BaseSprite {
     ) {
       return;
     }
-    if (!this.isOnPlatform || this.hasReachedXEdge()) {
+    if (!this.isOnPlatform) {
       this.lastTurnTime = time;
       this.turnAround(this.currentDirection);
     } else {

@@ -45,6 +45,7 @@
             1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1739, 1739, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1675, 1739, 1739, 1740, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1675, 1675, 0, 0, 0, 0, 0, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739, 1739],
          "height":40,
          "id":3,
+         "locked":true,
          "name":"colliders",
          "opacity":0.18,
          "type":"tilelayer",
@@ -56,7 +57,6 @@
         {
          "draworder":"topdown",
          "id":4,
-         "locked":true,
          "name":"player_zones",
          "objects":[
                 {
@@ -80,8 +80,8 @@
                  "rotation":0,
                  "visible":true,
                  "width":0,
-                 "x":1563.19514661274,
-                 "y":192.11324570273
+                 "x":1587.86181327941,
+                 "y":202.11324570273
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -196,45 +196,8 @@
         {
          "draworder":"topdown",
          "id":5,
-         "locked":true,
          "name":"enemy_spawns",
          "objects":[
-                {
-                 "class":"",
-                 "height":0,
-                 "id":3,
-                 "name":"",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"enemy",
-                         "type":"string",
-                         "value":"snake"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":0,
-                 "x":517.694641051567,
-                 "y":200.202224469161
-                }, 
-                {
-                 "class":"",
-                 "height":0,
-                 "id":4,
-                 "name":"",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"enemy",
-                         "type":"string",
-                         "value":"bird"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":0,
-                 "x":979.440512301988,
-                 "y":330.299966295922
-                }, 
                 {
                  "class":"",
                  "height":0,
@@ -266,7 +229,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":6,
+ "nextobjectid":7,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.2",

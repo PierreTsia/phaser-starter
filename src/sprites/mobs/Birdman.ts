@@ -28,6 +28,7 @@ export default class Birdman extends Enemy {
     super("bird_man", scene, x, y, animConfigs);
     this.setBodySize(this.width - 40, 45);
     this.setOffset(10, 20);
+    super.speed = 200;
   }
 
   turn(direction: Direction) {
