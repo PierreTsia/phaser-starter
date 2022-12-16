@@ -1,6 +1,5 @@
 import BaseScene from "./BaseScene";
 import { GameConfig } from "../index";
-import { SpriteAnimations } from "../sprites/types";
 
 export default class PreloadAssets extends BaseScene {
   constructor(config: GameConfig) {
@@ -25,14 +24,11 @@ export default class PreloadAssets extends BaseScene {
         frameHeight: 38,
       }
     );
-    this.load.spritesheet(
-      SpriteAnimations.hit_effect,
-      "assets/weapons/hit_effect_sheet.png",
-      {
-        frameWidth: 32,
-        spacing: 32,
-      }
-    );
+
+    this.load.spritesheet("hit_effect", "assets/weapons/hit_effect_sheet.png", {
+      frameWidth: 32,
+      spacing: 32,
+    });
     this.load.spritesheet("bird_man", "assets/enemy/enemy_sheet.png", {
       frameWidth: 64,
       frameHeight: 64,

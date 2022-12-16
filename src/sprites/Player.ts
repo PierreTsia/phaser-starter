@@ -70,6 +70,11 @@ export default class Player extends BaseSprite {
     );
   }
 
+  stand() {
+    super.stand();
+    this.play(SpriteAnimations.idle, true);
+  }
+
   update(time: number, delta: number) {
     super.update(time, delta);
     if (this.hasBeenHit) {
@@ -78,7 +83,7 @@ export default class Player extends BaseSprite {
     const { left, right, space } = this.cursors;
     const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space);
 
-    if (this.anims.isPlaying && this.anims.currentAnim.key === "spell_cast") {
+    if (this.isAnimPlaying(SpriteAnimations.spell_cast)) {
       return;
     }
 

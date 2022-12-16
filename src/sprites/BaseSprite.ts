@@ -1,5 +1,6 @@
 import { GameConfig } from "../index";
 import GameScene from "../scenes/GameScene";
+import { SpriteAnimations } from "./types";
 
 export type Direction = "left" | "right";
 export interface AnimConfig {
@@ -79,6 +80,10 @@ export default class BaseSprite extends Phaser.Physics.Arcade.Sprite {
 
   get watchYourFeetAngle() {
     return this.isFacingLeft ? 120 : 60;
+  }
+
+  isAnimPlaying(anim: SpriteAnimations) {
+    return this.anims.isPlaying && this.anims.currentAnim.key === anim;
   }
 
   hasReachedXEdge() {

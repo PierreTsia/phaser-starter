@@ -6,6 +6,13 @@ import Projectile from "../spells/Projectile";
 import { SpriteAnimations } from "../types";
 
 export type IEnemy = Enemy & Collidable;
+const animConfigs: AnimConfig = {
+  hit_effect: {
+    frameRate: 8,
+    repeat: 0,
+    frames: [0, 4],
+  },
+};
 
 export default class Enemy extends BaseSprite {
   speed: number = 100;
@@ -33,7 +40,7 @@ export default class Enemy extends BaseSprite {
     this.setImmovable(true);
     this.edgeDetect = new EdgeDetectionRay(scene, this, scene.layers.colliders);
 
-    super.animate(name, anims);
+    super.animate(name, { ...anims, ...animConfigs });
   }
 
   takesHit(source: Projectile) {
@@ -99,7 +106,7 @@ export default class Enemy extends BaseSprite {
     super.update(time, delta);
     this.edgeDetect.refreshRay();
     this.isOnPlatform = !this.edgeDetect.isOnEdge;
-    if (this.anims.isPlaying && this.anims.currentAnim.key === "damaged") {
+    if (this.isAnimPlaying(SpriteAnimations.damaged)) {
       return;
     }
     this.patrol(time);
