@@ -9,7 +9,7 @@ export default class DetectionRay {
   source!: BaseSprite;
   intersects: Array<Phaser.Geom.Point> = [];
   debug = {
-    enabled: true, //enable debug mode
+    enabled: false, //enable debug mode
     maps: true, //enable maps debug
     rays: true, //enable rays debug
     graphics: {
