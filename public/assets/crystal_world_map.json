@@ -287,6 +287,24 @@
                  "width":0,
                  "x":576,
                  "y":330
+                }, 
+                {
+                 "class":"",
+                 "height":0,
+                 "id":11,
+                 "name":"",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"enemy",
+                         "type":"string",
+                         "value":"bird"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":0,
+                 "x":85.3333333333333,
+                 "y":562
                 }],
          "opacity":1,
          "properties":[
@@ -301,7 +319,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":11,
+ "nextobjectid":14,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.2",

@@ -6,7 +6,7 @@ export default class FireBall extends Projectiles {
     super(scene, "fireball", {
       coolDown: 200,
       speed: 200,
-      range: 100,
+      range: 300,
       damage: 30,
     });
   }

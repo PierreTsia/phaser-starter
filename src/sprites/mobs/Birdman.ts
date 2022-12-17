@@ -24,6 +24,7 @@ const animConfigs: AnimConfig = {
   },
 };
 export default class Birdman extends Enemy {
+  spellCast = null;
   constructor(scene: GameScene, x: number, y: number) {
     super("bird_man", scene, x, y, animConfigs);
     this.setBodySize(this.width - 40, 45);

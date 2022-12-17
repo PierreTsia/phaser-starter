@@ -9,6 +9,10 @@ import GameObjectWithBody = Phaser.Types.Physics.Arcade.GameObjectWithBody;
 import debounce from "lodash/debounce";
 import Projectile from "../sprites/weapons/Projectile";
 import MeleeWeapon from "../sprites/weapons/MeleeWeapon";
+import GameObject = Phaser.GameObjects.GameObject;
+import Birdman from "../sprites/mobs/Birdman";
+import Snakeman from "../sprites/mobs/Snakeman";
+import { DebouncedFunc } from "lodash";
 
 const LAYERS = ["colliders", "environment", "platforms"] as const;
 const ZONES = ["startZone", "endZone"] as const;
@@ -24,31 +28,58 @@ export default class GameScene extends BaseScene {
   line: Phaser.Geom.Line = new Phaser.Geom.Line();
   collisions: Collisions = new Collisions();
   raycasterPlugin!: PhaserRaycaster;
+  enemies: Phaser.GameObjects.Group;
 
   constructor(config: GameConfig) {
     super("GameScene", config);
+    this.enemies = new Phaser.GameObjects.Group(this);
   }
 
   create() {
     const map = this.createMap();
     this.layers = this.createLayers(map);
+
+    this.physics.world.setBounds(...this.bounds);
     const { start, end } = this.createPlayerZones(map);
     this.initPlayer(start);
     this.initEndOfLevel(end);
-    this.initCameras();
-    this.physics.world.setBounds(...this.bounds);
     this.populateWithEnemies(map);
+    this.initCameras();
+  }
+
+  getEnemiesSpellCasts() {
+    type Enemy = Birdman | Snakeman;
+    return this.enemies.getChildren().reduce((acc, e: GameObject) => {
+      if ((e as Enemy)?.spellCast) {
+        acc.push(...((e as Enemy)?.spellCast?.getChildren() as Projectile[]));
+      }
+      return acc;
+    }, [] as GameObject[]);
   }
 
   private populateWithEnemies(map: Phaser.Tilemaps.Tilemap) {
     const spawns = this.createSpawningZones(map);
-    spawns.forEach((s) => this.summonEnemy(s));
+    spawns.forEach((s) => {
+      const enemy = this.summonEnemy(s);
+      this.enemies.add(enemy);
+      enemy.walk(enemy.currentDirection);
+    });
+    this.enablePlayerCollidesSpellcasts();
+  }
+
+  enablePlayerCollidesSpellcasts() {
+    this.player.addCollider(
+      this.getEnemiesSpellCasts(),
+      (player, projectile) => {
+        (player as Player).takesDamage(projectile as Projectile);
+      }
+    );
   }
 
   summonEnemy(spawn: Phaser.Types.Tilemaps.TiledObject) {
     const enemy = this.createEnemy(spawn);
     this.createEnemyColliders(enemy);
-    enemy.walk(enemy.currentDirection);
+    return enemy;
   }
 
   private createEnemyColliders(enemy: IEnemy) {
@@ -58,15 +89,12 @@ export default class GameScene extends BaseScene {
         this.collisions.onPlayerCollidesEnemy(this.player, enemy)
       )
       .addCollider(
-        // @ts-ignore
         this.player.projectiles,
-        // @ts-ignore
-        this.onWeaponHit
+        this.onWeaponHit as ArcadePhysicsCallback
       )
       .addOverlap(
         this.player.meleeWeapon,
-        // @ts-ignore
-        debounce(this.onWeaponHit, 20)
+        debounce(this.onWeaponHit, 20) as DebouncedFunc<ArcadePhysicsCallback>
       );
   }
 

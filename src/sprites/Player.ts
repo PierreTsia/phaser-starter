@@ -7,6 +7,7 @@ import { SpriteAnimations } from "./types";
 import Sword from "./weapons/Sword";
 import Projectiles from "./weapons/Projectiles";
 import IceBall from "./weapons/IceBall";
+import Projectile from "./weapons/Projectile";
 
 export type IPlayer = Player & Collidable;
 
@@ -133,13 +134,17 @@ export default class Player extends BaseSprite {
     });
   }
 
-  takesDamage() {
+  takesDamage(source?: Projectile) {
     if (this.hasBeenHit) return;
+    const damage = source?.damage ?? 10;
+    if (source) {
+      source.deliversHit(this);
+    }
     this.scene.cameras.main.shake(100, 0.01);
     this.hasBeenHit = true;
     this.bounceOff();
     const hitAnim = this.playAnimDamage();
-    this.health -= 30;
+    this.health -= damage;
     this.hp.update(this.health);
 
     this.scene.time.delayedCall(500, () => {

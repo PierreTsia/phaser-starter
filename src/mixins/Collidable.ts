@@ -1,15 +1,18 @@
 import BaseSprite from "../sprites/BaseSprite";
+import Projectiles from "../sprites/weapons/Projectiles";
 
 type GConstructor<T = {}> = new (...args: any[]) => T;
+
+type CollidingObject =
+  | Phaser.GameObjects.GameObject
+  | Phaser.GameObjects.GameObject[]
+  | Projectiles;
 
 export type SpriteConstructor = GConstructor<BaseSprite>;
 
 export function WithCollision<TBase extends SpriteConstructor>(Base: TBase) {
   return class extends Base {
-    addCollider(
-      object: Phaser.GameObjects.GameObject,
-      callback?: ArcadePhysicsCallback
-    ) {
+    addCollider(object: CollidingObject, callback?: ArcadePhysicsCallback) {
       this.scene.physics.add.collider(this, object, callback, undefined, this);
       return this;
     }
@@ -26,7 +29,7 @@ export function WithCollision<TBase extends SpriteConstructor>(Base: TBase) {
 
 export interface Collidable {
   addCollider: (
-    object: Phaser.GameObjects.GameObject,
+    object: CollidingObject,
     callback?: ArcadePhysicsCallback
   ) => this;
 
