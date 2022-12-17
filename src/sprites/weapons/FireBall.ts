@@ -1,12 +1,12 @@
 import GameScene from "../../scenes/GameScene";
 import Projectiles from "./Projectiles";
 
-export default class IceBallSpell extends Projectiles {
+export default class FireBall extends Projectiles {
   constructor(scene: GameScene) {
-    super(scene, "iceball", {
+    super(scene, "fireball", {
       coolDown: 200,
-      speed: 500,
-      range: 400,
+      speed: 200,
+      range: 100,
       damage: 30,
     });
   }

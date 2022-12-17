@@ -34,7 +34,6 @@ export default class GameScene extends BaseScene {
     this.layers = this.createLayers(map);
     const { start, end } = this.createPlayerZones(map);
     this.initPlayer(start);
-
     this.initEndOfLevel(end);
     this.initCameras();
     this.physics.world.setBounds(...this.bounds);

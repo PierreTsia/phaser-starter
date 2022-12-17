@@ -9,6 +9,10 @@ export default class PreloadAssets extends BaseScene {
     this.load.tilemapTiledJSON("level_1", "assets/crystal_world_map.json");
     this.load.image("tiles", "assets/main_lev_build_1.png");
     this.load.image("iceball", "assets/weapons/iceball_001.png");
+    this.load.image("iceball_2", "assets/weapons/iceball_002.png");
+    this.load.image("fireball", "assets/weapons/improved_fireball_001.png");
+    this.load.image("fireball_2", "assets/weapons/improved_fireball_002.png");
+    this.load.image("fireball_3", "assets/weapons/improved_fireball_003.png");
 
     this.load.spritesheet("player", "assets/player/move_sprite_1.png", {
       frameWidth: 32,

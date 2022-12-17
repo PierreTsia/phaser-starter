@@ -77,9 +77,10 @@ export default class Enemy extends BaseSprite {
 
     this.turn(this.currentDirection);
     this.moveToInitialPosition();
-
-    this.isTurning = false;
-    this.walk(this.currentDirection);
+    setTimeout(() => {
+      this.isTurning = false;
+      this.walk(this.currentDirection);
+    }, 100);
   }
 
   private moveToInitialPosition() {
@@ -125,7 +126,7 @@ export default class Enemy extends BaseSprite {
     ) {
       return;
     }
-    if (!this.isOnPlatform) {
+    if (!this.isOnPlatform || this.hasReachedXEdge()) {
       this.lastTurnTime = time;
       this.turnAround(this.currentDirection);
     } else {

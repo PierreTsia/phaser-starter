@@ -2,10 +2,11 @@ import BaseSprite, { AnimConfig, Direction } from "./BaseSprite";
 import { Collidable } from "../mixins/Collidable";
 import GameScene from "../scenes/GameScene";
 import HealthBar from "../scenes/utils/HealthBar";
-import IceBallSpell from "./weapons/IceBallSpell";
 import MeleeWeapon from "./weapons/MeleeWeapon";
 import { SpriteAnimations } from "./types";
 import Sword from "./weapons/Sword";
+import Projectiles from "./weapons/Projectiles";
+import IceBall from "./weapons/IceBall";
 
 export type IPlayer = Player & Collidable;
 
@@ -41,7 +42,7 @@ export default class Player extends BaseSprite {
   hp: HealthBar;
   health: number = 100;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  projectiles: IceBallSpell;
+  projectiles: Projectiles;
   meleeWeapon: MeleeWeapon;
   constructor(scene: GameScene, x: number, y: number) {
     super("player", scene, x, y);
@@ -49,7 +50,7 @@ export default class Player extends BaseSprite {
     this.setOffset(8, 5);
     this.speed = scene.config.playerSpeed;
     this.jumpRange = this.speed * 1.8;
-    this.projectiles = new IceBallSpell(scene);
+    this.projectiles = new IceBall(scene);
     this.meleeWeapon = new Sword(scene);
     this.cursors = scene.input.keyboard.createCursorKeys();
     scene.input.keyboard.on("keydown-Q", this.castIceBall, this);

@@ -16,14 +16,21 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.body.setSize(this.width - 13, this.height - 20);
+    this.initAnimations();
   }
 
-  fire(x: number, y: number, direction: Direction = "right") {
+  fire(
+    x: number,
+    y: number,
+    direction: Direction = "right",
+    spriteKey: string
+  ) {
     this.flipX = direction === "left";
     this.activateProjectile(true);
     this.body.reset(x, y);
     const velocity = direction === "left" ? -this.speed : this.speed;
     this.setVelocityX(velocity);
+    this.anims.play(spriteKey, true);
   }
 
   deliversHit(target: Sprite) {
@@ -50,5 +57,23 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
       this.traveledDistance = 0;
       this.body?.reset(0, 0);
     }
+  }
+  private initAnimations() {
+    this.anims.create({
+      key: "fireball",
+      repeat: -1,
+      frameRate: 12,
+      frames: [
+        { key: "fireball" },
+        { key: "fireball_2" },
+        { key: "fireball_3" },
+      ],
+    });
+    this.anims.create({
+      key: "iceball",
+      repeat: -1,
+      frameRate: 5,
+      frames: [{ key: "iceball" }, { key: "iceball_2" }],
+    });
   }
 }

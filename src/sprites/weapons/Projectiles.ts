@@ -10,14 +10,19 @@ interface ProjectileConfig {
   damage: number;
 }
 
+const PROJECTILE_KEYS = ["fireball", "iceball"];
+type ProjectileKey = typeof PROJECTILE_KEYS[number];
+
 export default class Projectiles extends Phaser.Physics.Arcade.Group {
   coolDown = 200;
   lastShot: number = 0;
   speed: number = 200;
   range: number = 200;
   damage: number = 10;
+  spriteKey: ProjectileKey;
   constructor(scene: GameScene, spriteKey: string, config?: ProjectileConfig) {
     super(scene.physics.world, scene);
+    this.spriteKey = spriteKey;
     config?.speed && (this.speed = config.speed);
     config?.coolDown && (this.coolDown = config.coolDown);
     config?.range && (this.range = config.range);
@@ -54,7 +59,7 @@ export default class Projectiles extends Phaser.Physics.Arcade.Group {
     if (now - this.lastShot < this.coolDown || !projectile) {
       return;
     }
-    projectile.fire(x, y, direction);
+    projectile.fire(x, y, direction, this.spriteKey);
     this.lastShot = now;
   }
 }
