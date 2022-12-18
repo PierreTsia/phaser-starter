@@ -51,6 +51,7 @@ export default class Player extends BaseSprite {
     this.setOffset(8, 5);
     this.speed = scene.config.playerSpeed;
     this.jumpRange = this.speed * 1.8;
+
     this.projectiles = new IceBall(scene);
     this.meleeWeapon = new Sword(scene);
     this.cursors = scene.input.keyboard.createCursorKeys();

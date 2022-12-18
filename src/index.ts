@@ -21,7 +21,7 @@ const SHARED_CONFIG = {
   mapOffsetX: MAP_WIDTH > WIDTH ? MAP_WIDTH - WIDTH : 0,
   mapOffsetY: MAP_HEIGHT > HEIGHT ? MAP_HEIGHT - HEIGHT : 0,
   zoomFactor: ZOOM_FACTOR,
-  debug: true,
+  debug: false,
   leftTopCorner: {
     x: (WIDTH - WIDTH / ZOOM_FACTOR) / 2,
     y: (HEIGHT - HEIGHT / ZOOM_FACTOR) / 2,

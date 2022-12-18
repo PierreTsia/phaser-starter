@@ -11,7 +11,7 @@ interface ProjectileConfig {
 }
 
 const PROJECTILE_KEYS = ["fireball", "iceball"];
-type ProjectileKey = typeof PROJECTILE_KEYS[number];
+export type ProjectileKey = typeof PROJECTILE_KEYS[number];
 
 export default class Projectiles extends Phaser.Physics.Arcade.Group {
   coolDown = 200;
@@ -35,6 +35,10 @@ export default class Projectiles extends Phaser.Physics.Arcade.Group {
       key: spriteKey,
       classType: Projectile,
     });
+
+    scene.physics.add.collider(scene.layers.colliders, this, (projectile) => {
+      (projectile as Projectile).crashesOnTile(this.spriteKey);
+    });
   }
 
   create(
@@ -46,7 +50,7 @@ export default class Projectiles extends Phaser.Physics.Arcade.Group {
     active?: boolean | undefined
   ): void {
     super.create(x, y, key, frame, visible, active);
-    (this.getChildren() as Projectile[]).forEach((projectile: Projectile) => {
+    (this.getChildren() as Projectile[]).forEach((projectile) => {
       projectile.speed = this.speed;
       projectile.maxDistance = this.range;
       projectile.damage = this.damage;

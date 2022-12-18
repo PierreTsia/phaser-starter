@@ -21,4 +21,6 @@ export enum SpriteAnimations {
   throw = "throw",
   run = "run",
   hit_effect = "hit_effect",
+  iceball_impact = "iceball_impact",
+  fireball_impact = "fireball_impact",
 }

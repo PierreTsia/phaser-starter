@@ -26,6 +26,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     spriteKey: string
   ) {
     this.flipX = direction === "left";
+    console.log("spriteKey", spriteKey);
     this.activateProjectile(true);
     this.body.reset(x, y);
     const velocity = direction === "left" ? -this.speed : this.speed;
@@ -45,6 +46,24 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
   activateProjectile(value: boolean) {
     this.setActive(value);
     this.setVisible(value);
+  }
+
+  crashesOnTile(key: PropertyKey) {
+    const animKey =
+      key === "fireball"
+        ? SpriteAnimations.fireball_impact
+        : SpriteAnimations.iceball_impact;
+    this.anims.play(animKey, true);
+    this.scene.time.delayedCall(
+      200,
+      () => {
+        this.activateProjectile(false);
+        this.traveledDistance = 0;
+        this.body.reset(0, 0);
+      },
+      [],
+      this
+    );
   }
 
   preUpdate(time: number, delta: number) {
@@ -74,6 +93,27 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
       repeat: -1,
       frameRate: 5,
       frames: [{ key: "iceball" }, { key: "iceball_2" }],
+    });
+
+    this.anims.create({
+      key: "iceball_impact",
+      repeat: 0,
+      frameRate: 12,
+      frames: [
+        { key: "iceball_impact" },
+        { key: "iceball_impact_2" },
+        { key: "iceball_impact_3" },
+      ],
+    });
+    this.anims.create({
+      key: "fireball_impact",
+      repeat: 0,
+      frameRate: 12,
+      frames: [
+        { key: "fireball_impact" },
+        { key: "fireball_impact_2" },
+        { key: "fireball_impact_3" },
+      ],
     });
   }
 }
