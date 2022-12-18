@@ -15,6 +15,7 @@ import Snakeman from "../sprites/mobs/Snakeman";
 import { DebouncedFunc } from "lodash";
 import Collectible from "./utils/Collectible";
 import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
+import ScoreBox from "./utils/ScoreBox";
 
 const LAYERS = ["colliders", "environment", "platforms"] as const;
 const ZONES = ["startZone", "endZone"] as const;
@@ -32,7 +33,8 @@ export default class GameScene extends BaseScene {
   raycasterPlugin!: PhaserRaycaster;
   enemies: Phaser.GameObjects.Group;
   collectibles!: StaticGroup;
-  score = 0;
+  scoreBox!: ScoreBox;
+  score: number = 0;
 
   constructor(config: GameConfig) {
     super("GameScene", config);
@@ -43,13 +45,19 @@ export default class GameScene extends BaseScene {
     const map = this.createMap();
     this.layers = this.createLayers(map);
     this.collectibles = this.spawnCollectibles(map);
-    console.log(this.collectibles);
     this.physics.world.setBounds(...this.bounds);
     const { start, end } = this.createPlayerZones(map);
     this.initPlayer(start);
     this.initEndOfLevel(end);
     this.populateWithEnemies(map);
     this.initCameras();
+    const { rightTopCorner } = this.config;
+    this.scoreBox = new ScoreBox(
+      this,
+      rightTopCorner.x - 50,
+      rightTopCorner.y + 10,
+      this.score
+    );
   }
 
   spawnCollectibles(map: Phaser.Tilemaps.Tilemap) {
@@ -149,8 +157,7 @@ export default class GameScene extends BaseScene {
   }
 
   onCollect(_player: any, collectible: Collectible) {
-    this.score += collectible.score;
-    console.log(this.score);
+    this.scoreBox.updateScoreboard(collectible.score);
     collectible.destroy();
   }
 
