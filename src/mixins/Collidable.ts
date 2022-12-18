@@ -1,9 +1,13 @@
 import BaseSprite from "../sprites/BaseSprite";
 import Projectiles from "../sprites/weapons/Projectiles";
+import Group = Phaser.GameObjects.Group;
+import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
 
 type GConstructor<T = {}> = new (...args: any[]) => T;
 
 type CollidingObject =
+  | StaticGroup
+  | Group
   | Phaser.GameObjects.GameObject
   | Phaser.GameObjects.GameObject[]
   | Projectiles;
@@ -17,10 +21,7 @@ export function WithCollision<TBase extends SpriteConstructor>(Base: TBase) {
       return this;
     }
 
-    addOverlap(
-      object: Phaser.GameObjects.GameObject,
-      callback?: ArcadePhysicsCallback
-    ) {
+    addOverlap(object: CollidingObject, callback?: ArcadePhysicsCallback) {
       this.scene.physics.add.overlap(this, object, callback, undefined, this);
       return this;
     }
@@ -34,7 +35,7 @@ export interface Collidable {
   ) => this;
 
   addOverlap: (
-    object: Phaser.GameObjects.GameObject,
+    object: CollidingObject,
     callback?: ArcadePhysicsCallback
   ) => this;
 }

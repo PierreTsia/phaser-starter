@@ -26,7 +26,6 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     spriteKey: string
   ) {
     this.flipX = direction === "left";
-    console.log("spriteKey", spriteKey);
     this.activateProjectile(true);
     this.body.reset(x, y);
     const velocity = direction === "left" ? -this.speed : this.speed;

@@ -13,6 +13,8 @@ import GameObject = Phaser.GameObjects.GameObject;
 import Birdman from "../sprites/mobs/Birdman";
 import Snakeman from "../sprites/mobs/Snakeman";
 import { DebouncedFunc } from "lodash";
+import Collectible from "./utils/Collectible";
+import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
 
 const LAYERS = ["colliders", "environment", "platforms"] as const;
 const ZONES = ["startZone", "endZone"] as const;
@@ -29,6 +31,8 @@ export default class GameScene extends BaseScene {
   collisions: Collisions = new Collisions();
   raycasterPlugin!: PhaserRaycaster;
   enemies: Phaser.GameObjects.Group;
+  collectibles!: StaticGroup;
+  score = 0;
 
   constructor(config: GameConfig) {
     super("GameScene", config);
@@ -38,13 +42,29 @@ export default class GameScene extends BaseScene {
   create() {
     const map = this.createMap();
     this.layers = this.createLayers(map);
-
+    this.collectibles = this.spawnCollectibles(map);
+    console.log(this.collectibles);
     this.physics.world.setBounds(...this.bounds);
     const { start, end } = this.createPlayerZones(map);
     this.initPlayer(start);
     this.initEndOfLevel(end);
     this.populateWithEnemies(map);
     this.initCameras();
+  }
+
+  spawnCollectibles(map: Phaser.Tilemaps.Tilemap) {
+    const collectibles = map.getObjectLayer("collectibles").objects;
+    const collectiblesGroup = this.physics.add.staticGroup();
+    collectibles.forEach((c) => {
+      const collectibleName = c.properties?.find(
+        (p: { name?: string }) => p.name === "collectible_type"
+      )?.value;
+      const collectible = new Collectible(this, c.x!, c.y!, collectibleName);
+
+      collectiblesGroup.add(collectible);
+    });
+    collectiblesGroup.playAnimation("diamond_shine");
+    return collectiblesGroup;
   }
 
   getEnemiesSpellCasts() {
@@ -90,20 +110,20 @@ export default class GameScene extends BaseScene {
       )
       .addCollider(
         this.player.projectiles,
-        this.onWeaponHit as ArcadePhysicsCallback
+        this.onWeaponHit.bind(this) as ArcadePhysicsCallback
       )
       .addOverlap(
         this.player.meleeWeapon,
-        debounce(this.onWeaponHit, 20) as DebouncedFunc<ArcadePhysicsCallback>
+        debounce(
+          this.onWeaponHit.bind(this),
+          20
+        ) as DebouncedFunc<ArcadePhysicsCallback>
       );
   }
 
-  onWeaponHit = (
-    enemy: GameObjectWithBody,
-    weapon: Projectile | MeleeWeapon
-  ) => {
+  onWeaponHit(enemy: GameObjectWithBody, weapon: Projectile | MeleeWeapon) {
     (enemy as IEnemy).takesHit(weapon);
-  };
+  }
 
   private createEnemy(spawn: Phaser.Types.Tilemaps.TiledObject): IEnemy {
     const enemyName = this.getEnemyName(spawn);
@@ -122,6 +142,16 @@ export default class GameScene extends BaseScene {
     const PlayerWithCollision = WithCollision(Player);
     this.player = new PlayerWithCollision(this, start.x!, start.y!);
     this.player.addCollider(this.layers.colliders);
+    this.player.addOverlap(
+      this.collectibles,
+      this.onCollect.bind(this) as ArcadePhysicsCallback
+    );
+  }
+
+  onCollect(_player: any, collectible: Collectible) {
+    this.score += collectible.score;
+    console.log(this.score);
+    collectible.destroy();
   }
 
   private createPlayerZones(map: Phaser.Tilemaps.Tilemap) {
@@ -171,6 +201,7 @@ export default class GameScene extends BaseScene {
     const [colliders, environment, platforms] = LAYERS.map((layer) =>
       map.createLayer(layer, tileset)
     );
+    console.log(map.getObjectLayer("collectibles").objects);
     colliders.setCollisionByProperty({ collides: true });
     return { environment, platforms, colliders };
   }

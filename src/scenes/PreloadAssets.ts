@@ -26,6 +26,29 @@ export default class PreloadAssets extends BaseScene {
     this.load.image("fireball_2", "assets/weapons/improved_fireball_002.png");
     this.load.image("fireball_3", "assets/weapons/improved_fireball_003.png");
 
+    this.load.image("diamond", "assets/collectibles/diamond.png");
+    this.load.image("diamond_shine", "assets/collectibles/diamond_big_01.png");
+    this.load.image(
+      "diamond_shine_2",
+      "assets/collectibles/diamond_big_02.png"
+    );
+    this.load.image(
+      "diamond_shine_3",
+      "assets/collectibles/diamond_big_03.png"
+    );
+    this.load.image(
+      "diamond_shine_4",
+      "assets/collectibles/diamond_big_04.png"
+    );
+    this.load.image(
+      "diamond_shine_5",
+      "assets/collectibles/diamond_big_05.png"
+    );
+    this.load.image(
+      "diamond_shine_6",
+      "assets/collectibles/diamond_big_06.png"
+    );
+
     this.load.image(
       "fireball_impact",
       "assets/weapons/improved_fireball_impact_001.png"
@@ -54,6 +77,12 @@ export default class PreloadAssets extends BaseScene {
         frameHeight: 38,
       }
     );
+
+    this.load.spritesheet("player_slide", "assets/player/slide_sheet.png", {
+      frameWidth: 32,
+      spacing: 32,
+      frameHeight: 38,
+    });
 
     this.load.spritesheet("bird_man", "assets/enemy/enemy_sheet.png", {
       frameWidth: 64,

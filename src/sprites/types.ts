@@ -23,4 +23,5 @@ export enum SpriteAnimations {
   hit_effect = "hit_effect",
   iceball_impact = "iceball_impact",
   fireball_impact = "fireball_impact",
+  slide = "slide",
 }

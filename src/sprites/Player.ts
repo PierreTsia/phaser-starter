@@ -13,6 +13,11 @@ export type IPlayer = Player & Collidable;
 
 export default class Player extends BaseSprite {
   animConfigs: AnimConfig = {
+    slide: {
+      frames: [0, 2],
+      frameRate: 10,
+      repeat: 0,
+    },
     throw: {
       frames: [0, 6],
       frameRate: 14,
@@ -45,6 +50,7 @@ export default class Player extends BaseSprite {
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   projectiles: Projectiles;
   meleeWeapon: MeleeWeapon;
+  isSliding = false;
   constructor(scene: GameScene, x: number, y: number) {
     super("player", scene, x, y);
     this.setBodySize(this.width - 10, 35);
@@ -66,15 +72,15 @@ export default class Player extends BaseSprite {
     );
 
     // throw is a reserved word in JS
-    const { throw: throwAttack, ...rest } = this.animConfigs;
+    const { throw: throwAttack, slide, ...rest } = this.animConfigs;
     super.animate("player", rest);
     super.animate("player_attack", { throw: throwAttack });
+    super.animate("player_slide", { slide });
   }
 
   private meleeAtack() {
     if (this.meleeWeapon.canSwing()) {
       this.play(SpriteAnimations.throw, true);
-      console.log("melee atack");
       this.meleeWeapon.swing(this, this.isFacingLeft ? "left" : "right");
     }
   }
@@ -93,18 +99,26 @@ export default class Player extends BaseSprite {
     this.play(SpriteAnimations.idle, true);
   }
 
-  update(time: number, delta: number) {
-    super.update(time, delta);
-    if (this.hasBeenHit) {
+  handleSlide() {
+    if (!this.isOnTheGround()) {
       return;
     }
-    const { left, right, space } = this.cursors;
-    const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space);
+    this.scene.input.keyboard.on("keydown-DOWN", () => {
+      this.body.setSize(this.width, this.height / 2);
+      this.setOffset(0, this.height / 2);
+      this.setVelocityX(0);
+      this.play(SpriteAnimations.slide, true);
+      this.isSliding = true;
+    });
 
-    if (this.isAnimPlaying(SpriteAnimations.throw)) {
-      return;
-    }
+    this.scene.input.keyboard.on("keyup-DOWN", () => {
+      this.body.setSize(this.width, 38);
+      this.setOffset(0, 0);
+      this.isSliding = false;
+    });
+  }
 
+  handleJump(isSpaceJustDown: boolean, isSpaceDown: boolean) {
     if (!this.isOnTheGround()) {
       this.play(SpriteAnimations.jump, true);
       const canDoubleJump = this.jumpCount < this.allowedJumps;
@@ -113,17 +127,40 @@ export default class Player extends BaseSprite {
       }
     } else {
       this.jumpCount = 0;
-      if (space.isDown) {
+      if (isSpaceDown) {
         this.jump();
       }
-      if (left.isDown) {
-        this.run("left");
-      } else if (right.isDown) {
-        this.run("right");
-      } else {
-        this.stand();
-      }
     }
+  }
+
+  handleRun(left: Phaser.Input.Keyboard.Key, right: Phaser.Input.Keyboard.Key) {
+    if (!this.isOnTheGround()) {
+      return;
+    }
+    if (left.isDown) {
+      this.run("left");
+    } else if (right.isDown) {
+      this.run("right");
+    } else {
+      this.stand();
+    }
+  }
+
+  update(time: number, delta: number) {
+    super.update(time, delta);
+    if (
+      this.hasBeenHit ||
+      this.isSliding ||
+      this.isAnimPlaying(SpriteAnimations.throw)
+    ) {
+      return;
+    }
+
+    const { left, right, space } = this.cursors;
+    const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space);
+    this.handleJump(isSpaceJustDown, space.isDown);
+    this.handleSlide();
+    this.handleRun(left, right);
   }
 
   playAnimDamage() {
