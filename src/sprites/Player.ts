@@ -43,7 +43,9 @@ export default class Player extends BaseSprite {
   jumpRange: number;
   jumpCount = 0;
   allowedJumps = 2;
-  hasBeenHit: boolean = false;
+  hasJustBeenHit: boolean = false;
+  lastTimeHit: number = 0;
+  recoverTime = 3000;
   bounceVelocity: number = 250;
   hp: HealthBar;
   health: number = 100;
@@ -79,19 +81,21 @@ export default class Player extends BaseSprite {
   }
 
   private meleeAtack() {
-    if (this.meleeWeapon.canSwing()) {
+    if (this.meleeWeapon.canSwing() && !this.isRecoverMode) {
       this.play(SpriteAnimations.throw, true);
       this.meleeWeapon.swing(this, this.isFacingLeft ? "left" : "right");
     }
   }
 
   private castIceBall() {
-    this.play(SpriteAnimations.throw, true);
-    this.projectiles.fireProjectile(
-      this.body.center.x,
-      this.body.center.y,
-      this.isFacingLeft ? "left" : "right"
-    );
+    if (!this.isRecoverMode) {
+      this.play(SpriteAnimations.throw, true);
+      this.projectiles.fireProjectile(
+        this.body.center.x,
+        this.body.center.y,
+        this.isFacingLeft ? "left" : "right"
+      );
+    }
   }
 
   stand() {
@@ -149,7 +153,7 @@ export default class Player extends BaseSprite {
   update(time: number, delta: number) {
     super.update(time, delta);
     if (
-      this.hasBeenHit ||
+      this.hasJustBeenHit ||
       this.isSliding ||
       this.isAnimPlaying(SpriteAnimations.throw)
     ) {
@@ -172,21 +176,31 @@ export default class Player extends BaseSprite {
     });
   }
 
-  takesDamage(source?: Projectile) {
-    if (this.hasBeenHit) return;
+  get isRecoverMode() {
+    return Date.now() - this.lastTimeHit < this.recoverTime;
+  }
+
+  takesDamage(source?: Projectile | { damage: number }) {
+    if (this.hasJustBeenHit || this.isRecoverMode) {
+      return;
+    }
     const damage = source?.damage ?? 10;
-    if (source) {
+    if (source instanceof Projectile) {
       source.deliversHit(this);
     }
     this.scene.cameras.main.shake(100, 0.01);
-    this.hasBeenHit = true;
+    this.hasJustBeenHit = true;
+    this.lastTimeHit = Date.now();
     this.bounceOff();
     const hitAnim = this.playAnimDamage();
     this.health -= damage;
     this.hp.update(this.health);
+    this.stop();
 
-    this.scene.time.delayedCall(500, () => {
-      this.hasBeenHit = false;
+    this.scene.time.delayedCall(600, () => {
+      this.hasJustBeenHit = false;
+    });
+    this.scene.time.delayedCall(this.recoverTime, () => {
       hitAnim.stop();
       this.clearTint();
     });

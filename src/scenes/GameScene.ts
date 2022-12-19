@@ -17,7 +17,7 @@ import Collectible from "./utils/Collectible";
 import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
 import ScoreBox from "./utils/ScoreBox";
 
-const LAYERS = ["colliders", "environment", "platforms"] as const;
+const LAYERS = ["colliders", "environment", "platforms", "traps"] as const;
 const ZONES = ["startZone", "endZone"] as const;
 type ZoneName = typeof ZONES[number];
 type LayerName = typeof LAYERS[number];
@@ -96,7 +96,7 @@ export default class GameScene extends BaseScene {
   }
 
   enablePlayerCollidesSpellcasts() {
-    this.player.addCollider(
+    this.player.addOverlap(
       this.getEnemiesSpellCasts(),
       (player, projectile) => {
         (player as Player).takesDamage(projectile as Projectile);
@@ -113,7 +113,7 @@ export default class GameScene extends BaseScene {
   private createEnemyColliders(enemy: IEnemy) {
     enemy
       .addCollider(this.layers.colliders)
-      .addCollider(this.player, () =>
+      .addOverlap(this.player, () =>
         this.collisions.onPlayerCollidesEnemy(this.player, enemy)
       )
       .addCollider(
@@ -149,11 +149,23 @@ export default class GameScene extends BaseScene {
   private initPlayer(start: Phaser.Types.Tilemaps.TiledObject) {
     const PlayerWithCollision = WithCollision(Player);
     this.player = new PlayerWithCollision(this, start.x!, start.y!);
-    this.player.addCollider(this.layers.colliders);
+    this.player
+      .addCollider(this.layers.colliders)
+      .addCollider(this.layers.traps, (player) => {
+        const damage = this.getTrapsDamages();
+        (player as IPlayer).takesDamage({ damage });
+      });
     this.player.addOverlap(
       this.collectibles,
       this.onCollect.bind(this) as ArcadePhysicsCallback
     );
+  }
+
+  getTrapsDamages() {
+    const prop: any = this.layers.traps.layer.properties?.find(
+      (p: any) => p?.name === "damage"
+    );
+    return prop?.value ?? 0;
   }
 
   onCollect(_player: any, collectible: Collectible) {
@@ -205,11 +217,11 @@ export default class GameScene extends BaseScene {
 
   private createLayers(map: Phaser.Tilemaps.Tilemap) {
     const tileset = map.getTileset("main_lev_build_1");
-    const [colliders, environment, platforms] = LAYERS.map((layer) =>
+    const [colliders, environment, platforms, traps] = LAYERS.map((layer) =>
       map.createLayer(layer, tileset)
     );
-    console.log(map.getObjectLayer("collectibles").objects);
     colliders.setCollisionByProperty({ collides: true });
-    return { environment, platforms, colliders };
+    traps.setCollisionByExclusion([-1]);
+    return { environment, platforms, colliders, traps };
   }
 }
