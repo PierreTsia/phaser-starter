@@ -49,6 +49,30 @@ export default class GameScene extends BaseScene {
 
   create() {
     const map = this.createMap();
+    const bg = map.getObjectLayer("distance_bg").objects[0];
+    const thirdTS = map.getTileset("bg_spikes_tileset");
+
+    const d = map.createLayer("distant", thirdTS);
+    console.log("-> d", d);
+    this.add
+      .tileSprite(
+        bg.x!,
+        bg.y!,
+        this.config.width!,
+        bg.height!,
+        "bg_dark_spikes"
+      )
+      .setOrigin(0, 1)
+      .setScrollFactor(0, 1)
+      .setDepth(-10);
+    console.log(d);
+    this.add
+      .tileSprite(0, 0, this.config.width, 180, "bg_sky")
+      .setOrigin(0, 0)
+      .setDepth(-11)
+      .setScale(2.15)
+      .setScrollFactor(0, 1);
+
     this.layers = this.createLayers(map);
     this.collectibles = this.spawnCollectibles(map);
     this.physics.world.setBounds(...this.bounds);
@@ -227,14 +251,18 @@ export default class GameScene extends BaseScene {
   private createMap() {
     const map = this.make.tilemap({ key: "level_1" });
     map.addTilesetImage("main_lev_build_1", "tiles");
+    map.addTilesetImage("main_lev_build_2", "tiles_2");
+    map.addTilesetImage("bg_spikes_tileset", "bg_spikes_tileset");
     return map;
   }
 
   private createLayers(map: Phaser.Tilemaps.Tilemap) {
-    const tileset = map.getTileset("main_lev_build_1");
+    const mainTS = map.getTileset("main_lev_build_1");
+
     const [colliders, environment, platforms, traps] = LAYERS.map((layer) =>
-      map.createLayer(layer, tileset)
+      map.createLayer(layer, mainTS)
     );
+
     colliders.setCollisionByProperty({ collides: true });
     traps.setCollisionByExclusion([-1]);
     return { environment, platforms, colliders, traps };
