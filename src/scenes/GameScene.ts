@@ -16,7 +16,10 @@ import { DebouncedFunc } from "lodash";
 import Collectible from "./utils/Collectible";
 import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
 import ScoreBox from "./utils/ScoreBox";
-import EventEmitter, { GameEvents } from "./../events/EventEmitter";
+import EventEmitter, {
+  GAME_STATUS,
+  GameEvents,
+} from "./../events/EventEmitter";
 
 const LAYERS = ["colliders", "environment", "platforms", "traps"] as const;
 const ZONES = ["startZone", "endZone"] as const;
@@ -37,6 +40,7 @@ export default class GameScene extends BaseScene {
   scoreBox!: ScoreBox;
   score: number = 0;
   eventEmitter = new EventEmitter();
+  status: GAME_STATUS = GAME_STATUS.PLAYING;
 
   constructor(config: GameConfig) {
     super("GameScene", config);
@@ -62,7 +66,12 @@ export default class GameScene extends BaseScene {
     );
 
     this.eventEmitter.on(GameEvents.PLAYER_LOOSE, () => {
-      this.scene.restart();
+      this.status = GAME_STATUS.GAME_OVER;
+      this.eventEmitter.emit(GameEvents.STOP_GAME);
+      this.scene.pause();
+      setTimeout(() => {
+        this.scene.restart({ status: GAME_STATUS.PLAYING, score: 0 });
+      }, 1000);
     });
   }
 

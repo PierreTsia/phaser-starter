@@ -1,6 +1,7 @@
 import { GameConfig } from "../index";
 import GameScene from "../scenes/GameScene";
 import { SpriteAnimations } from "./types";
+import { GameEvents } from "../events/EventEmitter";
 
 export type Direction = "left" | "right";
 export interface AnimConfig {
@@ -29,6 +30,16 @@ export default class BaseSprite extends Phaser.Physics.Arcade.Sprite {
     this.setOrigin(0.5, 1);
     this.setGravity(0, 800);
     this.setCollideWorldBounds(true);
+
+    scene.eventEmitter.on(
+      GameEvents.STOP_GAME,
+      () => {
+        this.setActive(false);
+        this.setVisible(false);
+      },
+      this
+    );
+
     scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this);
   }
 
