@@ -41,38 +41,23 @@ export default class GameScene extends BaseScene {
   score: number = 0;
   eventEmitter = new EventEmitter();
   status: GAME_STATUS = GAME_STATUS.PLAYING;
+  skyBg!: Phaser.GameObjects.TileSprite;
+  spikesBg!: Phaser.GameObjects.TileSprite;
 
   constructor(config: GameConfig) {
     super("GameScene", config);
     this.enemies = new Phaser.GameObjects.Group(this);
   }
 
+  update(time: number, delta: number) {
+    super.update(time, delta);
+    this.spikesBg.tilePositionX = this.cameras.main.scrollX * 0.7;
+    this.skyBg.tilePositionX = this.cameras.main.scrollX * 0.1;
+  }
+
   create() {
     const map = this.createMap();
-    const bg = map.getObjectLayer("distance_bg").objects[0];
-    const thirdTS = map.getTileset("bg_spikes_tileset");
-
-    const d = map.createLayer("distant", thirdTS);
-    console.log("-> d", d);
-    this.add
-      .tileSprite(
-        bg.x!,
-        bg.y!,
-        this.config.width!,
-        bg.height!,
-        "bg_dark_spikes"
-      )
-      .setOrigin(0, 1)
-      .setScrollFactor(0, 1)
-      .setDepth(-10);
-    console.log(d);
-    this.add
-      .tileSprite(0, 0, this.config.width, 180, "bg_sky")
-      .setOrigin(0, 0)
-      .setDepth(-11)
-      .setScale(2.15)
-      .setScrollFactor(0, 1);
-
+    this.createBackgrounds(map);
     this.layers = this.createLayers(map);
     this.collectibles = this.spawnCollectibles(map);
     this.physics.world.setBounds(...this.bounds);
@@ -97,6 +82,30 @@ export default class GameScene extends BaseScene {
         this.scene.restart({ status: GAME_STATUS.PLAYING, score: 0 });
       }, 1000);
     });
+  }
+
+  private createBackgrounds(map: Phaser.Tilemaps.Tilemap) {
+    const bg = map.getObjectLayer("distance_bg").objects[0];
+    const bgSpikesTS = map.getTileset("bg_spikes_tileset");
+    map.createLayer("distant", bgSpikesTS);
+    this.spikesBg = this.add
+      .tileSprite(
+        bg.x!,
+        bg.y!,
+        this.config.width!,
+        bg.height!,
+        "bg_dark_spikes"
+      )
+      .setOrigin(0, 1)
+      .setScrollFactor(0, 1)
+      .setDepth(-10);
+
+    this.skyBg = this.add
+      .tileSprite(0, 0, this.config.width, 180, "bg_sky")
+      .setOrigin(0, 0)
+      .setDepth(-11)
+      .setScale(2.15)
+      .setScrollFactor(0, 1);
   }
 
   spawnCollectibles(map: Phaser.Tilemaps.Tilemap) {

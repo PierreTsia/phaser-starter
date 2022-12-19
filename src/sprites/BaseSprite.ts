@@ -60,7 +60,7 @@ export default class BaseSprite extends Phaser.Physics.Arcade.Sprite {
   }
 
   isOnTheGround() {
-    return this.body.blocked.down;
+    return this.body?.blocked?.down;
   }
 
   move(direction: Direction, modifier = 1) {
@@ -94,7 +94,7 @@ export default class BaseSprite extends Phaser.Physics.Arcade.Sprite {
   }
 
   isAnimPlaying(anim: SpriteAnimations) {
-    return this.anims.isPlaying && this.anims.currentAnim.key === anim;
+    return this.anims?.isPlaying && this.anims.currentAnim.key === anim;
   }
 
   hasReachedXEdge() {
