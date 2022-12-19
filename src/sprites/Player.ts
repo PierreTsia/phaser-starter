@@ -8,6 +8,7 @@ import Sword from "./weapons/Sword";
 import Projectiles from "./weapons/Projectiles";
 import IceBall from "./weapons/IceBall";
 import Projectile from "./weapons/Projectile";
+import { GameEvents } from "../events/EventEmitter";
 
 export type IPlayer = Player & Collidable;
 
@@ -53,12 +54,14 @@ export default class Player extends BaseSprite {
   projectiles: Projectiles;
   meleeWeapon: MeleeWeapon;
   isSliding = false;
+  sceneEventsEmitter: Phaser.Events.EventEmitter;
   constructor(scene: GameScene, x: number, y: number) {
     super("player", scene, x, y);
     this.setBodySize(this.width - 10, 35);
     this.setOffset(8, 5);
     this.speed = scene.config.playerSpeed;
     this.jumpRange = this.speed * 1.8;
+    this.sceneEventsEmitter = scene.eventEmitter;
 
     this.projectiles = new IceBall(scene);
     this.meleeWeapon = new Sword(scene);
@@ -196,6 +199,10 @@ export default class Player extends BaseSprite {
     this.health -= damage;
     this.hp.update(this.health);
     this.stop();
+
+    if (this.health <= 0) {
+      this.sceneEventsEmitter.emit(GameEvents.PLAYER_LOOSE);
+    }
 
     this.scene.time.delayedCall(600, () => {
       this.hasJustBeenHit = false;

@@ -16,6 +16,7 @@ import { DebouncedFunc } from "lodash";
 import Collectible from "./utils/Collectible";
 import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
 import ScoreBox from "./utils/ScoreBox";
+import EventEmitter, { GameEvents } from "./../events/EventEmitter";
 
 const LAYERS = ["colliders", "environment", "platforms", "traps"] as const;
 const ZONES = ["startZone", "endZone"] as const;
@@ -35,6 +36,7 @@ export default class GameScene extends BaseScene {
   collectibles!: StaticGroup;
   scoreBox!: ScoreBox;
   score: number = 0;
+  eventEmitter = new EventEmitter();
 
   constructor(config: GameConfig) {
     super("GameScene", config);
@@ -58,6 +60,10 @@ export default class GameScene extends BaseScene {
       rightTopCorner.y + 10,
       this.score
     );
+
+    this.eventEmitter.on(GameEvents.PLAYER_LOOSE, () => {
+      this.scene.restart();
+    });
   }
 
   spawnCollectibles(map: Phaser.Tilemaps.Tilemap) {
